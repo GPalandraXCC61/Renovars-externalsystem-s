@@ -9,6 +9,22 @@ facileImmobiliare:
     agente:
       path: /agente
       
+wikiCasa:
+    protocol: https
+    host: sandbox.wikicasa.it
+    port: '8081'
+    basePath: /rest
+    authorization: ''
+    pathssoTokenForProvider: /auth/ssoTokenForProvider
+    PublicKey: pubkey-FacileImmobiliare_provider
+    PrivateKey: '![X2cM1wzxG/ZEvsaLsq8NzBlSmDrya6mUIPPeJkPVil6VpubWrkBr/lNQoa0KyMiL/jVli3bB07ymZAY+9g6PhA0gwcUj1anzmpktOlO9zPE=]'
+    realEstateManagement:
+      path: /realEstateWS
+    agents:
+      path: /agentWS
+    agencies:
+      path: /userWS
+      
     
 application:
   autodiscovery: '18611151'

@@ -13,8 +13,11 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	<api-gateway:autodiscovery apiId="${application.autodiscovery}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="5e58cd99-421e-4fbe-bf66-fd6a1f3b2668" flowRef="externalsystem-renovars-s-api-main" />
 	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="2c8d5cc5-afc3-4d1e-bbeb-3ffd7ef8d83c" file="${mule.env}-config.yaml" key="${secure.key}" />
 	<global-property doc:name="Global Property" doc:id="1e1e005a-374c-4b87-9c68-510a63423f65" name="secure.key" value="x!A%C*F-JaNdRgUk"/>
-	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="20bb769f-8555-471a-9ab0-06c68fecd703" >
+	<http:request-config name="HTTP_Request_configuration_facileImmobiliare" doc:name="HTTP Request configuration" doc:id="20bb769f-8555-471a-9ab0-06c68fecd703" >
 		<http:request-connection protocol="HTTPS" host="${facileImmobiliare.host}" connectionIdleTimeout="120000" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_WikiCasa" doc:name="HTTP Request configuration" doc:id="7ddebe52-7776-47cb-96cc-6e740f6a7574" >
+		<http:request-connection protocol="HTTPS" host="${wikiCasa.host}" connectionIdleTimeout="120000"/>
 	</http:request-config>
 	
 
