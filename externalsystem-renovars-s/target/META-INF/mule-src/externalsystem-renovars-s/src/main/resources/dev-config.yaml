@@ -1,0 +1,11 @@
+facileImmobiliare:
+    protocol: https
+    host: staging.facileimmobiliare.it
+    port: '8081'
+    basePath: /wp-json/wp/v2
+    authorization: ''
+    immobile:
+      path: /immobile
+    
+application:
+  autodiscovery: '18611151'

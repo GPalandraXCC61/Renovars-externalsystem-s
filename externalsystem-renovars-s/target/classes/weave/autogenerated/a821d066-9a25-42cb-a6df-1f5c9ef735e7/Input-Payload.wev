@@ -1,0 +1,40 @@
+%dw 2.0
+
+type auto_a821d066_9a25_42cb_a6df_1f5c9ef735e7_Input_Payload = {
+  request?: {
+    anno?: Number, 
+    locali?: Number, 
+    title?: String, 
+    panoramica_qualita?: String, 
+    via?: String, 
+    classe_energetica?: String, 
+    stato?: String, 
+    bagni?: Number, 
+    panoramica_distanza?: Number, 
+    descrizione_immobile?: String, 
+    ascensore?: Boolean, 
+    piano?: Number, 
+    provincia_immobili?: String, 
+    finiture_qualita?: String, 
+    map?: String, 
+    citta?: String, 
+    garage?: Boolean, 
+    riscaldamento?: String, 
+    balcone_mq?: Number, 
+    tipo_proprieta?: String, 
+    cucina_valore?: Number, 
+    impianti_qualita?: String, 
+    crm_id?: Number, 
+    tipologia_id?: Number, 
+    prezzo?: Number, 
+    superficie_mq?: Number, 
+    esposizione?: String, 
+    status?: String, 
+    giardino_mq?: Number, 
+    _?: Any
+  }, 
+  transactionId?: String | Null, 
+  timestamp?: String | Null, 
+  _?: Any
+}
+
