@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<global-property doc:name="Global Property" doc:id="93761bc2-1619-4df8-9a78-117ad5632d30" name="mule.env" value="dev" />
+	<global-property doc:name="Global Property" doc:id="89ba8b73-b9ee-43a0-9261-01cc4de8bffd" name="https.private.port" value="8081" />
+	<configuration-properties doc:name="Configuration properties" doc:id="1068b3f0-07f8-433b-8530-d5319f1038c8" file="${mule.env}-config.yaml" />
+	<api-gateway:autodiscovery apiId="${application.autodiscovery}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="5e58cd99-421e-4fbe-bf66-fd6a1f3b2668" flowRef="externalsystem-renovars-s-api-main" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="2c8d5cc5-afc3-4d1e-bbeb-3ffd7ef8d83c" file="${mule.env}-config.yaml" key="${secure.key}" />
+	<global-property doc:name="Global Property" doc:id="1e1e005a-374c-4b87-9c68-510a63423f65" name="secure.key" value="x!A%C*F-JaNdRgUk"/>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="20bb769f-8555-471a-9ab0-06c68fecd703" >
+		<http:request-connection protocol="HTTPS" host="${facileImmobiliare.host}" connectionIdleTimeout="120000" />
+	</http:request-config>
+	
+
+</mule>
