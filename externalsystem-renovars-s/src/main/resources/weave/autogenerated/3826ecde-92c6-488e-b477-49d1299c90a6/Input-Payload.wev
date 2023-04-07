@@ -1,0 +1,12 @@
+%dw 2.0
+
+type auto_3826ecde_92c6_488e_b477_49d1299c90a6_Input_Payload = {
+  request?: {
+    ExternalIdFacileImmobiliare?: Number, 
+    _?: Any
+  }, 
+  transactionId?: String | Null, 
+  timestamp?: String | Null, 
+  _?: Any
+}
+

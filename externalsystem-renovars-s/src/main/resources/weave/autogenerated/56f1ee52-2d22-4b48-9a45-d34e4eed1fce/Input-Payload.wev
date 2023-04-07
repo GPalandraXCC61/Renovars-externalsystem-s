@@ -1,0 +1,21 @@
+%dw 2.0
+
+type auto_56f1ee52_2d22_4b48_9a45_d34e4eed1fce_Input_Payload = {
+  request?: {
+    firstName?: String, 
+    lastName?: String, 
+    photoUrl?: String, 
+    crmId?: String, 
+    emailAddress?: String, 
+    role?: String, 
+    description?: String, 
+    propertiesManaged?: Number, 
+    title?: String, 
+    superiorEmail?: String, 
+    _?: Any
+  }, 
+  transactionId?: String | Null, 
+  timestamp?: String | Null, 
+  _?: Any
+}
+

@@ -1,0 +1,10 @@
+%dw 2.0
+
+type auto_57f19c66_2905_472d_8940_885b99fcfc2a_Output_Payload = {
+  success?: Boolean | Null, 
+  response?: { _?: Any }, 
+  transactionId?: String | Null, 
+  timestamp?: String | Null, 
+  _?: Any
+}
+

@@ -7,6 +7,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="postImmobileFacileImmobiliare" doc:id="a821d066-9a25-42cb-a6df-1f5c9ef735e7" >
 		<flow-ref doc:name="Flow Reference" doc:id="0d316fb9-6637-4332-8bc2-392388c8838c" name="initVars"/>
+		<logger level="INFO" doc:name="Logger" doc:id="403e60f1-6b03-43fc-84e0-ee51c6b8c6aa" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] post facileImmobiliare Immobile request: [' ++ (payload default '') ++ ']']" />
 		<ee:transform doc:name="Transform Message" doc:id="174ee7bb-4252-429f-8c4e-426fc7dde567" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -26,35 +27,35 @@ payload.request]]></ee:set-payload>
 {
 	"title": payload.title,
 	"status": payload.status,
-	"via": payload.via,
-	"citta": payload.citta,
-	"provincia_immobili": payload.provincia_immobili,
-	"descrizione_immobile": payload.descrizione_immobile,
-	"map": payload.map,
-	"prezzo": payload.prezzo,
-	"tipologia_id": payload.tipologia_id,
-	"superficie_mq": payload.superficie_mq,
-	"stato": payload.stato,
-	"anno": payload.anno,
-	"bagni": payload.bagni,
-	"locali": payload.locali,
-	"balcone_mq": payload.balcone_mq,
-	"giardino_mq": payload.giardino_mq,
-	"garage": payload.garage,
-	"ascensore": payload.ascensore,
-	"piano": payload.piano,
-	"esposizione": payload.esposizione,
-	"panoramica_distanza": payload.panoramica_distanza,
-	"panoramica_qualita": payload.panoramica_qualita,
-	"riscaldamento": payload.riscaldamento,
-	"classe_energetica": payload.classe_energetica,
-	"tipo_proprieta": payload.tipo_proprieta,
-	"finiture_qualita": payload.finiture_qualita,
-	"impianti_qualita": payload.impianti_qualita,
-	"cucina_valore": payload.cucina_valore,
-	"crm_id": payload.crm_id,
+	"via": payload.streetAddress,
+	"citta": payload.city,
+	"provincia_immobili": payload.propertyProvince,
+	"descrizione_immobile": payload.propertyDescription,
+	"map": payload.mapUrl,
+	"prezzo": payload.price,
+	"tipologia_id": payload.propertyTypeId,
+	"superficie_mq": payload.propertySizeQm,
+	"stato": payload.propertyCondition,
+	"anno": payload.year,
+	"bagni": payload.bathrooms,
+	"locali": payload.bedrooms,
+	"balcone_mq": payload.balconySizeQm,
+	"giardino_mq": payload.gardenSizeQm,
+	"garage": payload.garageIncluded,
+	"ascensore": payload.elevatorIncluded,
+	"piano": payload.floorNumber,
+	"esposizione": payload.exposure,
+	"panoramica_distanza": payload.panoramicDistanceKm,
+	"panoramica_qualita": payload.panoramicQuality,
+	"riscaldamento": payload.heatingType,
+	"classe_energetica": payload.energyClass,
+	"tipo_proprieta": payload.propertyOwnershipType,
+	"finiture_qualita": payload.finishesQuality,
+	"impianti_qualita": payload.systemsQuality,
+	"cucina_valore": payload.kitchenValue,
+	"crm_id": payload.crmId,
 	("gallery": payload.gallery) if payload.gallery != null,
-	"url_foto": payload.url_foto
+	"url_foto": payload.urlPhoto
 }]]]></http:query-params>
 			<http:response-validator >
 				<http:success-status-code-validator values="200..499" />
@@ -80,5 +81,136 @@ output application/json
 		<set-variable value="#[attributes.header.fName]" doc:name="Set Variable" doc:id="1501fa86-98e1-4986-9719-405acd467dc5" variableName="fname" />
 		<set-variable value="#[payload.transactionId]" doc:name="Set Variable1" doc:id="3c0be6cc-30e1-43d0-8297-8665a1c725db" variableName="transactionId" />
 		<set-variable value="#[payload.timestamp]" doc:name="Set Variable2" doc:id="469ab106-e343-4c07-8c38-a77c71695fe3" variableName="timestamp" />
+	</flow>
+	<flow name="deleteImmobileFacileImmobiliare" doc:id="57f19c66-2905-472d-8940-885b99fcfc2a" >
+		<flow-ref doc:name="Flow Reference" doc:id="c45f43cc-c38f-402d-8a32-94eb27689c34" name="initVars" />
+		<logger level="INFO" doc:name="Logger" doc:id="88f6d3d4-e250-4dec-9c00-2c4f3fbf4938" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] delete facileImmobiliare Immobile request: [' ++ (payload default '') ++ ']']" />
+		<ee:transform doc:name="Transform Message" doc:id="fa1620d1-0c2c-4a44-ba2d-14154f1c48ad" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.request]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="DELETE" doc:name="Request" doc:id="fd660581-3a79-4a23-83a1-afb8dbf90c4a" config-ref="HTTP_Request_configuration" path="${facileImmobiliare.basePath}${facileImmobiliare.immobile.path}/{ExternalIdFacileImmobiliare}" >
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Value"
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[{
+		"ExternalIdFacileImmobiliare": payload.ExternalIdFacileImmobiliare
+}]]]></http:uri-params>
+			<http:response-validator >
+				<http:success-status-code-validator values="200..499" />
+			</http:response-validator>
+		</http:request>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="9181ba6c-1621-428c-a14b-0a25451c7357" >
+				<logger level="INFO" doc:name="Logger" doc:id="bef1174c-b966-4136-a829-392c947b2392" message="#[error]" />
+				<ee:transform doc:name="Transform Message" doc:id="bfb8bfda-f7fe-4428-9290-78a42b283a6d" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.detailedDescription
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="deleteAgenteFacileImmobiliare" doc:id="3826ecde-92c6-488e-b477-49d1299c90a6" >
+		<flow-ref doc:name="Flow Reference" doc:id="d5039597-0acb-4076-8124-f25982686ba1" name="initVars" />
+		<logger level="INFO" doc:name="Logger" doc:id="14ae0bbf-7cff-4d70-a7c7-ead64f320b92" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] delete facileImmobiliare Agente request: [' ++ (payload default '') ++ ']']" />
+		<ee:transform doc:name="Transform Message" doc:id="b4132e45-b32e-448d-9463-a84935fcb3ec" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.request]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="DELETE" doc:name="Request" doc:id="402b4719-99ab-4073-8a47-67110792d380" config-ref="HTTP_Request_configuration" path="${facileImmobiliare.basePath}${facileImmobiliare.agente.path}/{ExternalIdFacileImmobiliare}" >
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Value"
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[{
+		"ExternalIdFacileImmobiliare": payload.ExternalIdFacileImmobiliare
+}]]]></http:uri-params>
+			<http:response-validator >
+				<http:success-status-code-validator values="200..499" />
+			</http:response-validator>
+		</http:request>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d66cc376-a82a-4390-a710-d0f195202c82" >
+				<logger level="INFO" doc:name="Logger" doc:id="f8e29f0c-c59f-4293-b3a3-4bc161cdccb8" message="#[error]" />
+				<ee:transform doc:name="Transform Message" doc:id="5a0cc347-fa98-423d-9a90-143c296e3748" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.detailedDescription
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="postAgenteFacileImmobiliare" doc:id="56f1ee52-2d22-4b48-9a45-d34e4eed1fce" >
+		<flow-ref doc:name="Flow Reference" doc:id="dea7c231-016d-4789-9935-2b9f7667abaf" name="initVars" />
+		<logger level="INFO" doc:name="Logger" doc:id="77d52714-ccf8-44a8-94b6-98f09f436cfb" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] delete facileImmobiliare Agente request: [' ++ (payload default '') ++ ']']" />
+		<ee:transform doc:name="Transform Message" doc:id="3994ee1a-a550-47bb-b577-75e5ff40ec42" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.request]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="4a22edc8-3f68-4b4f-807d-a5bdaff2a99f" config-ref="HTTP_Request_configuration" path="${facileImmobiliare.basePath}${facileImmobiliare.agente.path}" >
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Value"
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/json skipNullOn="everywhere"
+---
+{
+		"title": payload.title,
+		"ruolo": payload.role,
+		"nome": payload.firstName,
+		"cognome": payload.lastName,
+		"descrizione": payload.description,
+		"immobili_gestiti": payload.propertiesManaged,
+		"url_foto": payload.photoUrl,
+		"email": payload.emailAddress,
+		"email_superiore": payload.superiorEmail,
+		"crm_id": payload.crmId
+}]]]></http:query-params>
+			<http:response-validator >
+				<http:success-status-code-validator values="200..499" />
+			</http:response-validator>
+		</http:request>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="188d6d7b-49a5-4d59-9c60-9c5500e9f7e3" >
+				<logger level="INFO" doc:name="Logger" doc:id="65f71ba2-9c8b-4972-a445-d383260d6756" message="#[error]" />
+				<ee:transform doc:name="Transform Message" doc:id="e4b7b658-64de-4f25-bf9e-c274fad36c58" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.detailedDescription
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
 	</flow>
 </mule>

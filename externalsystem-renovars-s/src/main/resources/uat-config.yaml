@@ -6,6 +6,8 @@ facileImmobiliare:
     authorization: ''
     immobile:
       path: /immobile
+    agente:
+      path: /agente
     
 application:
   autodiscovery: '18611144'
