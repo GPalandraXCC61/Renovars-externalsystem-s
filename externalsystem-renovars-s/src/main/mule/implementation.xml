@@ -7,7 +7,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="postImmobileFacileImmobiliare" doc:id="a821d066-9a25-42cb-a6df-1f5c9ef735e7" >
 		<flow-ref doc:name="Flow Reference" doc:id="0d316fb9-6637-4332-8bc2-392388c8838c" name="initVars"/>
-		<logger level="INFO" doc:name="Logger" doc:id="403e60f1-6b03-43fc-84e0-ee51c6b8c6aa" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] post facileImmobiliare Immobile request: [' ++ (payload default '') ++ ']']" />
+		<logger level="INFO" doc:name="Logger" doc:id="403e60f1-6b03-43fc-84e0-ee51c6b8c6aa" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] post facileImmobiliare Immobile request: [' ++ (write(payload default '', &quot;application/json&quot;)) ++ ']']" />
 		<ee:transform doc:name="Transform Message" doc:id="174ee7bb-4252-429f-8c4e-426fc7dde567" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -61,6 +61,7 @@ payload.request]]></ee:set-payload>
 				<http:success-status-code-validator values="200..499" />
 			</http:response-validator>
 		</http:request>
+		<logger level="INFO" doc:name="Logger1" doc:id="fcf0c311-3731-4450-b594-5ca35a8dcee4" message="#[payload]" />
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="17a2f471-b908-449c-8bff-a6806217cd57" >
 				<logger level="INFO" doc:name="Logger" doc:id="b0f9e41e-0444-47e6-b7dc-28b1051f6e0a" message="#[error]"/>
@@ -78,13 +79,14 @@ output application/json
 		</error-handler>
 	</flow>
 	<flow name="initVars" doc:id="92905602-7ccf-40ad-8b01-9a77cf2b4c1c" >
-		<set-variable value="#[attributes.header.fName]" doc:name="Set Variable" doc:id="1501fa86-98e1-4986-9719-405acd467dc5" variableName="fname" />
-		<set-variable value="#[payload.transactionId]" doc:name="Set Variable1" doc:id="3c0be6cc-30e1-43d0-8297-8665a1c725db" variableName="transactionId" />
-		<set-variable value="#[payload.timestamp]" doc:name="Set Variable2" doc:id="469ab106-e343-4c07-8c38-a77c71695fe3" variableName="timestamp" />
+		<logger level="INFO" doc:name="Logger" doc:id="2b1c261e-439f-4da3-8855-e945909e5c0c" message="#[attributes]"/>
+		<set-variable value="#[attributes.header.fName default '']" doc:name="Set Variable" doc:id="1501fa86-98e1-4986-9719-405acd467dc5" variableName="fname" />
+		<set-variable value="#[payload.transactionId default '']" doc:name="Set Variable1" doc:id="3c0be6cc-30e1-43d0-8297-8665a1c725db" variableName="transactionId" />
+		<set-variable value="#[payload.timestamp default '']" doc:name="Set Variable2" doc:id="469ab106-e343-4c07-8c38-a77c71695fe3" variableName="timestamp" />
 	</flow>
 	<flow name="deleteImmobileFacileImmobiliare" doc:id="57f19c66-2905-472d-8940-885b99fcfc2a" >
 		<flow-ref doc:name="Flow Reference" doc:id="c45f43cc-c38f-402d-8a32-94eb27689c34" name="initVars" />
-		<logger level="INFO" doc:name="Logger" doc:id="88f6d3d4-e250-4dec-9c00-2c4f3fbf4938" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] delete facileImmobiliare Immobile request: [' ++ (payload default '') ++ ']']" />
+		<logger level="INFO" doc:name="Logger" doc:id="88f6d3d4-e250-4dec-9c00-2c4f3fbf4938" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] delete facileImmobiliare Immobile request: [' ++ (write(payload default '', &quot;application/json&quot;)) ++ ']']" />
 		<ee:transform doc:name="Transform Message" doc:id="fa1620d1-0c2c-4a44-ba2d-14154f1c48ad" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -106,6 +108,7 @@ payload.request]]></ee:set-payload>
 				<http:success-status-code-validator values="200..499" />
 			</http:response-validator>
 		</http:request>
+		<logger level="INFO" doc:name="Logger1" doc:id="8242e325-c126-4361-9ef1-6e4b7e3f9325" message="#[payload]" />
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="9181ba6c-1621-428c-a14b-0a25451c7357" >
 				<logger level="INFO" doc:name="Logger" doc:id="bef1174c-b966-4136-a829-392c947b2392" message="#[error]" />
@@ -124,7 +127,7 @@ output application/json
 	</flow>
 	<flow name="deleteAgenteFacileImmobiliare" doc:id="3826ecde-92c6-488e-b477-49d1299c90a6" >
 		<flow-ref doc:name="Flow Reference" doc:id="d5039597-0acb-4076-8124-f25982686ba1" name="initVars" />
-		<logger level="INFO" doc:name="Logger" doc:id="14ae0bbf-7cff-4d70-a7c7-ead64f320b92" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] delete facileImmobiliare Agente request: [' ++ (payload default '') ++ ']']" />
+		<logger level="INFO" doc:name="Logger" doc:id="14ae0bbf-7cff-4d70-a7c7-ead64f320b92" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] delete facileImmobiliare Agente request: [' ++ (write(payload default '', &quot;application/json&quot;)) ++ ']']" />
 		<ee:transform doc:name="Transform Message" doc:id="b4132e45-b32e-448d-9463-a84935fcb3ec" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -146,6 +149,7 @@ payload.request]]></ee:set-payload>
 				<http:success-status-code-validator values="200..499" />
 			</http:response-validator>
 		</http:request>
+		<logger level="INFO" doc:name="Logger1" doc:id="94aa3956-024a-4295-8500-be08509980a8" message="#[payload]" />
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d66cc376-a82a-4390-a710-d0f195202c82" >
 				<logger level="INFO" doc:name="Logger" doc:id="f8e29f0c-c59f-4293-b3a3-4bc161cdccb8" message="#[error]" />
@@ -171,7 +175,7 @@ output application/json
 	"PublicKey" : p('secure::wikiCasa.PublicKey')
 }]]]></http:headers>
 		</http:request>
-		<logger level="INFO" doc:name="Logger" doc:id="dc1e206e-bd7c-4569-9e68-b93f90eca823" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] ssoTokenForProvider Wiki Casa Response: [' ++ (payload default '') ++ ']']" />
+		<logger level="INFO" doc:name="Logger" doc:id="dc1e206e-bd7c-4569-9e68-b93f90eca823" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] ssoTokenForProvider Wiki Casa Response: [' ++ (write(payload default '', &quot;application/json&quot;)) ++ ']']" />
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ad4ee822-c66c-4b93-9f4e-802370be60a7" >
 				<logger level="INFO" doc:name="Logger" doc:id="390d3ba3-036e-4389-8b20-e317e8e57b92" message="#[error]" />
@@ -190,7 +194,7 @@ output application/json
 	</flow>
 	<flow name="postAgenteFacileImmobiliare" doc:id="56f1ee52-2d22-4b48-9a45-d34e4eed1fce" >
 		<flow-ref doc:name="Flow Reference" doc:id="dea7c231-016d-4789-9935-2b9f7667abaf" name="initVars" />
-		<logger level="INFO" doc:name="Logger" doc:id="77d52714-ccf8-44a8-94b6-98f09f436cfb" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] delete facileImmobiliare Agente request: [' ++ (payload default '') ++ ']']" />
+		<logger level="INFO" doc:name="Logger" doc:id="77d52714-ccf8-44a8-94b6-98f09f436cfb" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] post facileImmobiliare Agente request: [' ++ (write(payload default '', &quot;application/json&quot;)) ++ ']']" />
 		<ee:transform doc:name="Transform Message" doc:id="3994ee1a-a550-47bb-b577-75e5ff40ec42" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -223,6 +227,7 @@ payload.request]]></ee:set-payload>
 				<http:success-status-code-validator values="200..499" />
 			</http:response-validator>
 		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="f04d9189-dd43-4b60-bed1-ad86ad0d1c67" message="#[payload]"/>
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="188d6d7b-49a5-4d59-9c60-9c5500e9f7e3" >
 				<logger level="INFO" doc:name="Logger" doc:id="65f71ba2-9c8b-4972-a445-d383260d6756" message="#[error]" />
