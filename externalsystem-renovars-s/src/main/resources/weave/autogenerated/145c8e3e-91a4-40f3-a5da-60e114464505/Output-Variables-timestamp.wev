@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_145c8e3e_91a4_40f3_a5da_60e114464505_Output_Variables_timestamp = Any
+
