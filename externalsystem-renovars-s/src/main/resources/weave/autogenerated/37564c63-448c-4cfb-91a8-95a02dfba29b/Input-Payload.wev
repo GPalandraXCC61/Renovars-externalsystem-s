@@ -1,0 +1,37 @@
+%dw 2.0
+
+type auto_37564c63_448c_4cfb_91a8_95a02dfba29b_Input_Payload = {
+  request?: {
+    zipCode?: String | Null, 
+    image?: {
+      filename?: String | Null, 
+      _?: Any
+    }, 
+    displayName?: String | Null, 
+    companyName?: String | Null, 
+    latitude?: Number | Null, 
+    streetnumber?: String | Null, 
+    externalId?: String | Null, 
+    description?: String | Null, 
+    cityId?: String | Null, 
+    agenziaFin?: String | Null, 
+    webSite?: String | Null, 
+    password?: String | Null, 
+    businessMail?: String | Null, 
+    mobilePhone?: String | Null, 
+    surname?: String | Null, 
+    street?: String | Null, 
+    fiscalCode?: String | Null, 
+    name?: String | Null, 
+    landPhone?: String | Null, 
+    email?: String | Null, 
+    vatCode?: String | Null, 
+    username?: String | Null, 
+    longitude?: Number | Null, 
+    _?: Any
+  }, 
+  transactionId?: String | Null, 
+  timestamp?: String | Null, 
+  _?: Any
+}
+

@@ -246,7 +246,7 @@ output application/json
 	</flow>
 	<flow name="wikiCasaPostAgencie" doc:id="41bcd411-db08-452b-9305-dc7f855ed8a6" >
 		<flow-ref doc:name="Flow Reference" doc:id="e20ca075-6dd7-40d1-ba8e-eed1d1a09695" name="initVars"/>
-		<flow-ref doc:name="Flow Reference" doc:id="b6a4186e-d85b-450d-a12c-fade1b12ba54" name="wikiCasaSSOTokenForProvider" target="wikiCasaSSOToken"/>
+		<flow-ref doc:name="Flow Reference token" doc:id="b6a4186e-d85b-450d-a12c-fade1b12ba54" name="wikiCasaSSOTokenForProvider" target="wikiCasaSSOToken"/>
 		<logger level="INFO" doc:name="Logger" doc:id="c6ef9c24-5dd3-4490-89e0-58cdd2bd3678" message="#[vars.wikiCasaSSOToken]"/>
 		<logger level="INFO" doc:name="Logger" doc:id="c87ea7a5-2017-4f04-a685-7edc1e5f0993" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] post wikicasa Agenzia request: [' ++ (write(payload default '', &quot;application/json&quot;)) ++ ']']" />
 		<ee:transform doc:name="Transform Message" doc:id="080ab22e-ccf3-46e5-9a12-77bbe83f5ef2" >
@@ -264,12 +264,235 @@ payload.request]]></ee:set-payload>
 	("Authorization" : "Bearer " ++ vars.wikiCasaSSOToken) if vars.wikiCasaSSOToken != null,
 	"Content-Type" : "application/json"
 }]]]></http:headers>
+			<http:response-validator >
+				<http:success-status-code-validator values="200..499" />
+			</http:response-validator>
 		</http:request>
-		<logger level="INFO" doc:name="Logger1" doc:id="3a104657-b80b-41a6-8bb8-63f3ee9f3fb8" message="#[payload]" />
+		<logger level="INFO" doc:name="Logger" doc:id="3a104657-b80b-41a6-8bb8-63f3ee9f3fb8" message="#[payload]" />
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="fad78ea2-ac21-4862-98ef-6b7a51580662" >
-				<logger level="INFO" doc:name="Logger" doc:id="fab8eaca-fbfc-4321-8982-1ada18de6f35" message="#[error]" />
+				<logger level="INFO" doc:name="Logger" doc:id="fab8eaca-fbfc-4321-8982-1ada18de6f35" message="#[error.detailedDescription]" />
 				<ee:transform doc:name="Transform Message" doc:id="ca6b6117-464f-4195-a0b9-499539abc935" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.detailedDescription
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="wikiCasaPutAgencie" doc:id="ececb448-f1a5-42a5-a7f4-0f7fdc988959" >
+		<flow-ref doc:name="Flow Reference" doc:id="666af20a-d0e5-4b3b-96bd-02d9aeb6ed54" name="initVars" />
+		<flow-ref doc:name="Flow Reference token" doc:id="e0be1cdc-fd43-484a-ab71-a8893b19729b" name="wikiCasaSSOTokenForProvider" target="wikiCasaSSOToken" />
+		<logger level="INFO" doc:name="Logger" doc:id="5871cd4e-7163-4c5e-a2de-8f570d6c24a0" message="#[vars.wikiCasaSSOToken]" />
+		<logger level="INFO" doc:name="Logger" doc:id="19b6e5b3-ca6f-4f3c-8263-62fc6a159aea" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] put wikicasa Agenzia request: [' ++ (write(payload default '', &quot;application/json&quot;)) ++ ']']" />
+		<ee:transform doc:name="Transform Message" doc:id="4e769c35-f815-49d6-b866-4bdb56073ac6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.request]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="PUT" doc:name="Request" doc:id="b2911eb0-48ae-4819-8383-d39d6c3740a6" config-ref="HTTP_Request_configuration_WikiCasa" path="${wikiCasa.basePath}${wikiCasa.agencies.path}/{externalIdAgency}/edit" >
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	("Authorization" : "Bearer " ++ vars.wikiCasaSSOToken) if vars.wikiCasaSSOToken != null,
+	"Content-Type" : "application/json"
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"externalIdAgency" : payload.externalIdAgency
+}]]]></http:uri-params>
+			<http:response-validator >
+				<http:success-status-code-validator values="200..499" />
+			</http:response-validator>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="2494dc24-5ac7-44a2-8650-736c0e5daf4f" message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e4d39864-b075-439d-8f8a-ca687e52da7a" >
+				<logger level="INFO" doc:name="Logger" doc:id="35a41804-9195-43eb-9df8-630e3a8110a2" message="#[error]" />
+				<ee:transform doc:name="Transform Message" doc:id="75e89154-fc94-400b-86ab-ae6a637c2044" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.detailedDescription
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="wikiCasaPostAgent" doc:id="08108269-7733-445d-a67e-de760ef378dc" >
+		<flow-ref doc:name="Flow Reference" doc:id="58d894fd-dd32-4383-9d04-28a315900110" name="initVars" />
+		<flow-ref doc:name="Flow Reference token" doc:id="31f5ac0f-0b96-4e5f-aeec-ea50bbb43813" name="wikiCasaSSOTokenForProvider" target="wikiCasaSSOToken" />
+		<logger level="INFO" doc:name="Logger" doc:id="6ea671e1-126e-405c-87f1-2cbc921a74b0" message="#[vars.wikiCasaSSOToken]" />
+		<logger level="INFO" doc:name="Logger1" doc:id="e032c2ca-524c-41ee-964c-dd57a7cd2a91" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] post wikicasa Agente request: [' ++ (write(payload default '', &quot;application/json&quot;)) ++ ']']" />
+		<ee:transform doc:name="Transform Message" doc:id="b8c4492f-32f3-4d30-a1bc-5d3aa74bd151" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.request]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="41166f46-aa06-4679-b20c-7252866d3cac" config-ref="HTTP_Request_configuration_WikiCasa" path="${wikiCasa.basePath}${wikiCasa.agents.path}/{externalIdAgency}/new" >
+			<http:body ><![CDATA[#[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+{
+	name : payload.firstName,			
+  	surname : payload.lastName,		
+  	email : payload.email,			
+	phone : payload.phone,			
+	rea : payload.rea,
+    description : payload.description,
+	websiteUrl : payload.websiteUrl,
+	linkedinUrl : payload.linkedinUrl,
+	facebookUrl : payload.facebookUrl,
+	instagramUrl : payload.instagramUrl,
+	title : payload.title,
+	imageUrl : payload.photoUrl,
+}]]]></http:body>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	("Authorization" : "Bearer " ++ vars.wikiCasaSSOToken) if vars.wikiCasaSSOToken != null,
+	"Content-Type" : "application/json"
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"externalIdAgency" : payload.externalIdAgency,
+}]]]></http:uri-params>
+			<http:response-validator >
+				<http:success-status-code-validator values="200..499" />
+			</http:response-validator>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="5d09864d-b279-470c-9500-2f8103176da0" message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c812057f-dfec-4fb0-bad7-29e672825b4c" >
+				<logger level="INFO" doc:name="Logger" doc:id="6d0bc877-1d5e-4584-8351-5c73fdbcfcc7" message="#[error]" />
+				<ee:transform doc:name="Transform Message" doc:id="1fb3cbd2-c994-40b5-a080-7756b0a6e26f" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.detailedDescription
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="wikiCasaPutAgent" doc:id="37564c63-448c-4cfb-91a8-95a02dfba29b" >
+		<flow-ref doc:name="Flow Reference" doc:id="925d3d9d-0f0f-4409-ab76-a8a20ea72115" name="initVars" />
+		<flow-ref doc:name="Flow Reference token" doc:id="d74c7d01-0143-459c-825a-9318df78b98e" name="wikiCasaSSOTokenForProvider" target="wikiCasaSSOToken" />
+		<logger level="INFO" doc:name="Logger" doc:id="de8e916c-31d7-486a-9328-777cb6b02271" message="#[vars.wikiCasaSSOToken]" />
+		<logger level="INFO" doc:name="Logger1" doc:id="fa7341ef-f9b4-436b-89db-844b263a7fba" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] put wikicasa Agente request: [' ++ (write(payload default '', &quot;application/json&quot;)) ++ ']']" />
+		<ee:transform doc:name="Transform Message" doc:id="1723779e-44d7-401d-bf3c-d2d86e1107b1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.request]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="PUT" doc:name="Request" doc:id="ba3848ab-c23c-4711-97eb-d922e68aa5fe" config-ref="HTTP_Request_configuration_WikiCasa" path="${wikiCasa.basePath}${wikiCasa.agents.path}/{externalIdAgency}/{externalIdAgent}/edit" >
+			<http:body ><![CDATA[#[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+{
+	name : payload.firstName,			
+  	surname : payload.lastName,		
+  	email : payload.email,			
+	phone : payload.phone,			
+	rea : payload.rea,
+    description : payload.description,
+	websiteUrl : payload.websiteUrl,
+	linkedinUrl : payload.linkedinUrl,
+	facebookUrl : payload.facebookUrl,
+	instagramUrl : payload.instagramUrl,
+	title : payload.title,
+	imageUrl : payload.photoUrl,
+}]]]></http:body>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	("Authorization" : "Bearer " ++ vars.wikiCasaSSOToken) if vars.wikiCasaSSOToken != null,
+	"Content-Type" : "application/json"
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"externalIdAgency" : payload.externalIdAgency,
+    "externalIdAgent" : payload.externalIdAgent
+}]]]></http:uri-params>
+			<http:response-validator >
+				<http:success-status-code-validator values="200..499" />
+			</http:response-validator>
+		</http:request>
+		<logger level="INFO" doc:name="Logger2" doc:id="e3e3c9b9-a462-4d72-adc5-7c3d4c7c3026" message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="38e76313-3455-4075-8084-4208e3f4fa0b" >
+				<logger level="INFO" doc:name="Logger" doc:id="78e125b9-9156-4dc1-88e0-43efc30983d1" message="#[error]" />
+				<ee:transform doc:name="Transform Message" doc:id="89191e37-f15a-4d94-95c7-0a4a08613b5d" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.detailedDescription
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="wikiCasaDeleteAgent" doc:id="a89b62f7-5427-405f-bc3f-05a261349473" >
+		<flow-ref doc:name="Flow Reference" doc:id="e1feaa3e-b795-4300-ae13-d2a7b7f0456a" name="initVars" />
+		<flow-ref doc:name="Flow Reference token" doc:id="02b494f7-6d82-43d3-965b-15c0aca60f06" name="wikiCasaSSOTokenForProvider" target="wikiCasaSSOToken" />
+		<logger level="INFO" doc:name="Logger" doc:id="02e8ed8a-8c5e-4e48-8cc4-65268c1776fe" message="#[vars.wikiCasaSSOToken]" />
+		<logger level="INFO" doc:name="Logger1" doc:id="090d446b-4d6f-4b60-965d-7dd1add3714e" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] delete wikicasa Agente request: [' ++ (write(payload default '', &quot;application/json&quot;)) ++ ']']" />
+		<ee:transform doc:name="Transform Message" doc:id="dc10d4fa-2521-496c-8f07-61f325cfee6e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.request]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="DELETE" doc:name="Request" doc:id="1970007f-83cc-48a9-9386-b388d40e44a3" config-ref="HTTP_Request_configuration_WikiCasa" path="${wikiCasa.basePath}${wikiCasa.agents.path}/{externalIdAgency}/{externalIdAgent}/delete" >
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	("Authorization" : "Bearer " ++ vars.wikiCasaSSOToken) if vars.wikiCasaSSOToken != null,
+	"Content-Type" : "application/json"
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"externalIdAgency" : payload.externalIdAgency,
+    "externalIdAgent" : payload.externalIdAgent
+}]]]></http:uri-params>
+			<http:response-validator >
+				<http:success-status-code-validator values="200..499" />
+			</http:response-validator>
+		</http:request>
+		<logger level="INFO" doc:name="Logger2" doc:id="edaa050a-4dfb-4111-94dd-7046ab4b5d76" message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="fe860ddc-afaa-4285-8757-61368a749400" >
+				<logger level="INFO" doc:name="Logger" doc:id="9c3cabf8-bb88-4b7c-8047-a509105f49e7" message="#[error]" />
+				<ee:transform doc:name="Transform Message" doc:id="a7e2d769-87bb-4d11-a867-59b44126ef38" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json

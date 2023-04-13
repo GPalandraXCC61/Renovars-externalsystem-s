@@ -1,0 +1,6 @@
+%dw 2.0
+
+type auto_08108269_7733_445d_a67e_de760ef378dc_Output_Variables_wikiCasaSSOToken = {|  |} {"typeAlias": "Object",
+"class": "java.lang.Object",
+"typeId": "java.lang.Object"}
+
