@@ -535,13 +535,14 @@ payload - "agencyExternalId"]]]></http:body>
 	"agencyExternalId" : payload.agencyExternalId,
 }]]]></http:uri-params>
 			<http:response-validator >
-				<http:success-status-code-validator values="200..499" />
+				<http:success-status-code-validator values="200..500" />
 			</http:response-validator>
 		</http:request>
 		<logger level="INFO" doc:name="Logger2" doc:id="8eed1eae-53e5-4ce6-8697-0bf6050300a8" message="#[payload]" />
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="7da30769-d33d-4cee-85d0-3d32774fb361" >
-				<logger level="INFO" doc:name="Logger" doc:id="73cf9bd2-2b52-48a8-8aba-1670f6bcc2e9" message="#[error]" />
+				<logger level="INFO" doc:name="Logger" doc:id="d12ccc8f-6cd5-48d5-ada1-633fd828fa1d" message="#[payload]"/>
+				<logger level="INFO" doc:name="Logger" doc:id="73cf9bd2-2b52-48a8-8aba-1670f6bcc2e9" message="#[error.errorMessage]" />
 				<ee:transform doc:name="Transform Message" doc:id="f7292cb0-0729-4daa-9eed-cb635efb1b3a" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
