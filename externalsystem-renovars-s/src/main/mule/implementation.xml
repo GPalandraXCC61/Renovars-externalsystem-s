@@ -5,6 +5,12 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:request-config name="HTTP_Request_microsoftGraph_token_configuration" doc:name="HTTP Request configuration" doc:id="bffc083f-c159-4400-9ffc-139075dd0fc5" >
+		<http:request-connection protocol="HTTPS" host="${microsoftGraph.tokenUrl}" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="bf9a7fe5-e2f7-4702-8c25-7209f3a7cd0e" >
+		<http:request-connection host="${microsoftGraph.graphUrl}" protocol="HTTPS"/>
+	</http:request-config>
 	<flow name="postImmobileFacileImmobiliare" doc:id="a821d066-9a25-42cb-a6df-1f5c9ef735e7" >
 		<flow-ref doc:name="Flow Reference" doc:id="0d316fb9-6637-4332-8bc2-392388c8838c" name="initVars"/>
 		<logger level="INFO" doc:name="Logger" doc:id="403e60f1-6b03-43fc-84e0-ee51c6b8c6aa" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] post facileImmobiliare Immobile request: [' ++ (write(payload default '', &quot;application/json&quot;)) ++ ']']" />
@@ -371,7 +377,7 @@ output application/json skipNullOn="everywhere"
 			<http:uri-params ><![CDATA[#[output application/java
 ---
 {
-	"externalIdAgency" : payload.externalIdAgency,
+	"externalIdAgency" : payload.externalId,
 }]]]></http:uri-params>
 			<http:response-validator >
 				<http:success-status-code-validator values="200..499" />
@@ -481,11 +487,11 @@ payload.request]]></ee:set-payload>
 			<http:uri-params ><![CDATA[#[output application/java
 ---
 {
-	"externalIdAgency" : payload.externalIdAgency,
-    "externalIdAgent" : payload.externalIdAgent
+    "externalIdAgent" : payload.externalIdAgent,
+    "externalIdAgency": payload.externalIdAgency
 }]]]></http:uri-params>
 			<http:response-validator >
-				<http:success-status-code-validator values="200..499" />
+				<http:success-status-code-validator values="200..500" />
 			</http:response-validator>
 		</http:request>
 		<logger level="INFO" doc:name="Logger2" doc:id="edaa050a-4dfb-4111-94dd-7046ab4b5d76" message="#[payload]" />
@@ -645,7 +651,7 @@ payload.request]]></ee:set-payload>
 	"externalIdProperty" : payload.externalId
 }]]]></http:uri-params>
 			<http:response-validator >
-				<http:success-status-code-validator values="200..499" />
+				<http:success-status-code-validator values="200..500" />
 			</http:response-validator>
 		</http:request>
 		<logger level="INFO" doc:name="Logger2" doc:id="7cdc15de-f3e9-46ec-ad4a-2b714965a241" message="#[payload]" />
@@ -653,6 +659,91 @@ payload.request]]></ee:set-payload>
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="5841d72a-6e12-4a0e-b355-328b48226c47" >
 				<logger level="INFO" doc:name="Logger" doc:id="b57520c4-6333-4b26-a2a4-3692b3ec56e0" message="#[error]" />
 				<ee:transform doc:name="Transform Message" doc:id="e2f183be-2842-462a-997d-79b5d5751069" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.detailedDescription
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="tokenMicrosoftToken" doc:id="bdc0c926-41e2-4271-aa9c-7e2d1c6fdc7f" >
+		<http:request method="POST" doc:name="Request" doc:id="30e23080-6f4b-4c01-8fe4-6164c792eeb1" config-ref="HTTP_Request_microsoftGraph_token_configuration" path="/${microsoftGraph.tenantID}/oauth2/v2.0/token" >
+			<http:body ><![CDATA[#[%dw 2.0
+output multipart/form-data
+---
+{
+    //preamble: "Here is some text before the first boundary",
+    parts: {
+        grant_type: {
+            headers: {
+                "Content-Disposition": "form-data; name=\"grant_type\""
+            },
+            content: "client_credentials"
+        },
+        client_id: {
+            headers: {
+                "Content-Disposition": "form-data; name=\"client_id\""
+            },
+            content: "dcc2b3da-56fc-42ad-97bf-2f0dcc39a50d"
+        },
+        client_secret: {
+            headers: {
+                "Content-Disposition": "form-data; name=\"client_secret\""
+            },
+            content: "Z9E8Q~NJkDufMWmcRSBZ5sLnCChED2ne2md3Dbrh"
+        },
+        scope: {
+            headers: {
+                "Content-Disposition": "form-data; name=\"scope\""
+            },
+            content: "https://graph.microsoft.com/.default"
+        }
+    }
+}]]]></http:body>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="393cb7ee-8311-4974-b9cd-3c3017f46e82" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+if (payload.token_type != null) payload.token_type ++ " " ++ payload.access_token else payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="21f517e5-75fa-4035-84b3-d933330bad95" message="#[payload]" />
+		<logger level="INFO" doc:name="Logger1" doc:id="a5fc0a4d-f671-415d-930b-1cb4a8f6587a" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6dc37fba-ff0d-4e38-a5ca-f99c538ca61f" >
+				<logger level="INFO" doc:name="Logger" doc:id="0ddeac04-f0e4-46e4-a140-5b1330922f30" message="#[payload]" />
+				<logger level="INFO" doc:name="Logger1" doc:id="3c1459ea-20a4-47bd-9a9d-d1bb932073b4" message="#[error]" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="getUsers" doc:id="2f322ad5-8170-4671-9161-c15a7767c9ab" >
+		<flow-ref doc:name="Flow Reference" doc:id="bea79a4e-7fe1-4ad0-af56-c366a7046b72" name="tokenMicrosoftToken" target="token"/>
+		<http:request method="GET" doc:name="Request" doc:id="9946978a-0c56-4315-b08b-e6198a5acbf4" config-ref="HTTP_Request_configuration" path="${microsoftGraph.version}${microsoftGraph.users}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.token
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="b879c3ac-342f-481b-a790-b983fd6fe22b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="a8ebad7b-d2df-448d-9606-7168824e471a" >
+				<logger level="INFO" doc:name="Logger" doc:id="658aa639-e040-46a3-b8a9-6bdde7f29cad" message="#[error]" />
+				<ee:transform doc:name="Transform Message" doc:id="9871d99f-022a-493b-b57c-c8671073d4ad" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json

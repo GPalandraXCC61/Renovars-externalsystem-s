@@ -24,7 +24,14 @@ wikiCasa:
       path: /agentWS
     agencies:
       path: /userWS
-      
+
+microsoftGraph:
+  tokenUrl: login.microsoftonline.com
+  graphUrl: graph.microsoft.com
+  tenantID: '41626452-eba2-41bc-be57-b41addba41e1'
+  version: /v1.0
+  users: /users
+        
     
 application:
   autodiscovery: '18611151'
