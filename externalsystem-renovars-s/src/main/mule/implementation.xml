@@ -756,4 +756,37 @@ output application/json
 			</on-error-propagate>
 		</error-handler>
 	</flow>
+	<flow name="newPage" doc:id="8c72ec87-bb7b-41a2-bc60-b66ce8f136a2" >
+		<flow-ref doc:name="Flow Reference" doc:id="d3ba289d-6193-4eca-87de-88daec21eb35" name="tokenMicrosoftToken" target="token" />
+		<http:request method="GET" doc:name="Request" doc:id="428a9aea-bec7-410d-83f1-55d14113389a" url="#[payload]">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.token
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="25486e17-026c-42ec-b4cc-85ef6bea9478" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="b2cbbd51-5e3d-4b7e-8aab-0f2a33afd911" >
+				<logger level="INFO" doc:name="Logger" doc:id="5ea7bf99-8a6b-44ca-98e7-1126ee2d7c94" message="#[error]" />
+				<ee:transform doc:name="Transform Message" doc:id="7f400cc9-cd62-43fb-99db-479ad4d541ee" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.detailedDescription
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
 </mule>
