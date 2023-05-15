@@ -3,7 +3,7 @@
     <http:listener-config name="externalsystem-renovars-s-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8081" readTimeout="120000" />
     </http:listener-config>
-    <apikit:config name="externalsystem-renovars-s-api-config" api="resource::9b82ee49-beb3-47b7-a619-0e05153193f5:externalsystem-renovars-s-api:1.0.18:raml:zip:externalsystem-renovars-s-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="externalsystem-renovars-s-api-config" api="resource::9b82ee49-beb3-47b7-a619-0e05153193f5:externalsystem-renovars-s-api:1.0.21:raml:zip:externalsystem-renovars-s-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="externalsystem-renovars-s-api-main">
         <http:listener config-ref="externalsystem-renovars-s-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -132,10 +132,11 @@ output application/json
     <flow name="post:\ads\wikicasa\property:application\json:externalsystem-renovars-s-api-config">
         <flow-ref doc:name="Flow Reference" doc:id="0057bc9f-a9f9-4837-9aa9-11a3f7c40b28" name="wikiCasaPostProperty" />
     </flow>
-    <flow name="get:\microsoftgraph\users:application\json:externalsystem-renovars-s-api-config">
+    <flow name="get:\microsoftgraph\users:externalsystem-renovars-s-api-config">
         <flow-ref doc:name="Flow Reference" doc:id="466e4845-55aa-4f61-92e4-705471fae944" name="getUsers" />
     </flow>
-    <flow name="get:\microsoftgraph\newPage:externalsystem-renovars-s-api-config">
-		<flow-ref doc:name="Flow Reference" doc:id="3d53d7f0-40b6-4981-8e58-e2671feb9997" name="newPage"/>
+    <flow name="post:\microsoftgraph\newPage:application\json:externalsystem-renovars-s-api-config">
+        <logger level="INFO" doc:name="Logger" doc:id="da50003e-ea52-4d7c-9d1b-061cf4bd3d28" message="#[payload]" />
+		<flow-ref doc:name="Flow Reference" doc:id="3d53d7f0-40b6-4981-8e58-e2671feb9997" name="newPage" />
     </flow>
 </mule>

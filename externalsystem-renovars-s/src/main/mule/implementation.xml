@@ -758,6 +758,7 @@ output application/json
 	</flow>
 	<flow name="newPage" doc:id="8c72ec87-bb7b-41a2-bc60-b66ce8f136a2" >
 		<flow-ref doc:name="Flow Reference" doc:id="d3ba289d-6193-4eca-87de-88daec21eb35" name="tokenMicrosoftToken" target="token" />
+		<logger level="INFO" doc:name="Logger" doc:id="58c14628-e4a6-46ee-9065-9ccae9f34b22" message="#[payload]"/>
 		<http:request method="GET" doc:name="Request" doc:id="428a9aea-bec7-410d-83f1-55d14113389a" url="#[payload]">
 			<http:headers ><![CDATA[#[output application/java
 ---
