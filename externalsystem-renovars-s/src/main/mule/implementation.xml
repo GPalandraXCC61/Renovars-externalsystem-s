@@ -790,4 +790,48 @@ output application/json
 			</on-error-propagate>
 		</error-handler>
 	</flow>
+	<flow name="getCalendar" doc:id="d94457ae-dd6c-48c4-a943-f97bb7c42e3f" >
+		<flow-ref doc:name="Flow Reference" doc:id="365eb4d7-001b-4010-9254-ae8167a769a1" name="tokenMicrosoftToken" target="token" />
+		<http:request method="GET" doc:name="Request" doc:id="f6cf5982-6650-4ff1-a8d7-20a583557df3" config-ref="HTTP_Request_configuration" path="${microsoftGraph.version}${microsoftGraph.users}/{id}${microsoftGraph.calendar}" >
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.token
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"id" : attributes.uriParams.'id'
+}]]]></http:uri-params>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"enddatetime" : attributes.queryParams.enddatetime,
+	"startdatetime" : attributes.queryParams.startdatetime
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="9cc628fc-ced6-4e23-b9f4-6b0d2fd214c5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2c2b7058-60bf-47b9-9722-bd2b544424a9" >
+				<logger level="INFO" doc:name="Logger" doc:id="f97c00c3-83e2-4de7-abb0-ea68663b3ef9" message="#[error]" />
+				<ee:transform doc:name="Transform Message" doc:id="6a2edda2-1359-4e96-b5d0-010454c34373" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.detailedDescription
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
 </mule>

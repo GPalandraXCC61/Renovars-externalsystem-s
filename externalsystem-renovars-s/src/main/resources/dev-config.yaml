@@ -31,6 +31,7 @@ microsoftGraph:
   tenantID: '41626452-eba2-41bc-be57-b41addba41e1'
   version: /v1.0
   users: /users
+  calendar: /calendarview
         
     
 application:
