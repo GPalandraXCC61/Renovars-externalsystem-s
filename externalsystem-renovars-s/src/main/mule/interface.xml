@@ -139,29 +139,7 @@ output application/json
         <logger level="INFO" doc:name="Logger" doc:id="da50003e-ea52-4d7c-9d1b-061cf4bd3d28" message="#[payload]" />
         <flow-ref doc:name="Flow Reference" doc:id="3d53d7f0-40b6-4981-8e58-e2671feb9997" name="newPage" />
     </flow>
-    <flow name="get:\microsoftgraph\(id)\events:application\json:externalsystem-renovars-s-api-config">
-        <flow-ref doc:name="Flow Reference" doc:id="131cf429-538c-4242-8b67-88835e98b6a3" name="getCalendar" />
-    </flow>
     <flow name="get:\microsoftgraph\(id)\events:externalsystem-renovars-s-api-config">
-        <ee:transform doc:name="Transform Message">
-            <ee:variables>
-                <ee:set-variable variableName="id">attributes.uriParams.'id'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-        <ee:transform doc:name="Transform Message">
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  status: "400",
-  message: "Response code 400 mapped as Bad Request.",
-  "type": "RAML",
-  detail: "Error is unknown,please check RawMessage",
-  timestamp: "2019-08-13T14:31:03.683+01:00",
-  id: "59f80590-bdce-11e9-8ebf-f018987510e1"
-}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="131cf429-538c-4242-8b67-88835e98b6a3" name="getCalendar" />
     </flow>
 </mule>
