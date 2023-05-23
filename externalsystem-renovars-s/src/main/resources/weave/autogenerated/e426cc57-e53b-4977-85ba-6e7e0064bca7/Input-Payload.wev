@@ -1,0 +1,13 @@
+%dw 2.0
+
+type auto_e426cc57_e53b_4977_85ba_6e7e0064bca7_Input_Payload = {
+  subject?: String | Null, 
+  attendees?: Array<{ _?: Any }>, 
+  start?: { _?: Any }, 
+  end?: { _?: Any }, 
+  location?: { _?: Any }, 
+  body?: { _?: Any }, 
+  transactionId?: String | Null, 
+  _?: Any
+}
+
