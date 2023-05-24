@@ -3,7 +3,7 @@
     <http:listener-config name="externalsystem-renovars-s-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8081" readTimeout="120000" />
     </http:listener-config>
-    <apikit:config name="externalsystem-renovars-s-api-config" api="resource::9b82ee49-beb3-47b7-a619-0e05153193f5:externalsystem-renovars-s-api:1.0.26:raml:zip:externalsystem-renovars-s-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="externalsystem-renovars-s-api-config" api="resource::9b82ee49-beb3-47b7-a619-0e05153193f5:externalsystem-renovars-s-api:1.0.27:raml:zip:externalsystem-renovars-s-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="externalsystem-renovars-s-api-main">
         <http:listener config-ref="externalsystem-renovars-s-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -144,5 +144,8 @@ output application/json
     </flow>
     <flow name="post:\microsoftgraph\(id)\events:application\json:externalsystem-renovars-s-api-config">
         <flow-ref doc:name="Flow Reference" doc:id="28304ab5-eb8e-48a4-aa32-3f2a3b1e4b62" name="postCalendar" />
+    </flow>
+    <flow name="get:\realitycs\tipologie:externalsystem-renovars-s-api-config">
+		<flow-ref doc:name="Flow Reference" doc:id="944ffd8d-6c21-4d80-86d4-41acae338843" name="getTipologia"/>
     </flow>
 </mule>

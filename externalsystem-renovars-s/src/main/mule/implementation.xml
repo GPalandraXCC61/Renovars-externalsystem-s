@@ -11,6 +11,9 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="bf9a7fe5-e2f7-4702-8c25-7209f3a7cd0e" >
 		<http:request-connection host="${microsoftGraph.graphUrl}" protocol="HTTPS"/>
 	</http:request-config>
+	<http:request-config name="HTTP_Request_Realitycs_configuration" doc:name="HTTP Request configuration" doc:id="1e9805d3-21ea-4f0f-bad4-e8b8f5000ed0" >
+		<http:request-connection protocol="HTTPS" host="${realitycs.host}"/>
+	</http:request-config>
 	<flow name="postImmobileFacileImmobiliare" doc:id="a821d066-9a25-42cb-a6df-1f5c9ef735e7" >
 		<flow-ref doc:name="Flow Reference" doc:id="0d316fb9-6637-4332-8bc2-392388c8838c" name="initVars"/>
 		<logger level="INFO" doc:name="Logger" doc:id="403e60f1-6b03-43fc-84e0-ee51c6b8c6aa" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] post facileImmobiliare Immobile request: [' ++ (write(payload default '', &quot;application/json&quot;)) ++ ']']" />
@@ -715,7 +718,6 @@ if (payload.token_type != null) payload.token_type ++ " " ++ payload.access_toke
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="21f517e5-75fa-4035-84b3-d933330bad95" message="#[payload]" />
-		<logger level="INFO" doc:name="Logger1" doc:id="a5fc0a4d-f671-415d-930b-1cb4a8f6587a" />
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6dc37fba-ff0d-4e38-a5ca-f99c538ca61f" >
 				<logger level="INFO" doc:name="Logger" doc:id="0ddeac04-f0e4-46e4-a140-5b1330922f30" message="#[payload]" />
@@ -871,6 +873,75 @@ output application/json
 }]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="tokenRealitycs" doc:id="e23eb00f-d4fb-4299-87be-d242bd92c42f" >
+		<logger level="INFO" doc:name="Logger" doc:id="928658a4-309b-48ff-9e27-e991860a537f" message="tokenRealitycs"/>
+		<logger level="INFO" doc:name="Logger" doc:id="92d99535-73c3-4c1d-b796-857081604c19" message="#[%dw 2.0&#10;output application/x-www-form-urlencoded&#10;---&#10;{&#10;    &quot;grant_type&quot;: p('realitycs.grantType'),&#10;    &quot;username&quot;: p('realitycs.username'),&#10;    &quot;password&quot;: p('secure::realitycs.password')&#10;}]"/>
+		<http:request method="POST" doc:name="Request" doc:id="a690c43b-2771-4079-b2d4-d17f7ce1e874" config-ref="HTTP_Request_Realitycs_configuration" path="${realitycs.token}" >
+			<http:body ><![CDATA[#[%dw 2.0
+output application/x-www-form-urlencoded
+---
+{
+    "grant_type": p('realitycs.grantType'),
+    "username": p('realitycs.username'),
+    "password": p('secure::realitycs.password')
+}]]]></http:body>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" :"Basic " ++ p('secure::realitycs.authorization'),
+	"Content-Type" : "application/x-www-form-urlencoded"
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="77a0f27b-50a8-4ad2-8fa0-22272936c602" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.access_token]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="144a4b33-9eea-4769-b7cc-308b37add421" message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c27e0510-e019-42d4-9c6c-98a2c5eb4729" >
+				<logger level="INFO" doc:name="Logger" doc:id="82dc2473-4e87-4549-8599-f5d0ec7b6e11" message="#[payload]" />
+				<logger level="INFO" doc:name="Logger1" doc:id="9cb1f261-286c-4618-b799-92f4d8790aeb" message="#[error.description]" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="getTipologia" doc:id="39ebad97-9e61-41c2-8eed-32baa20bf0ba" >
+		<flow-ref doc:name="Flow Reference" doc:id="c172fa66-2a86-4230-8b56-53bff9f50cd9" name="tokenRealitycs" target="token"/>
+		<logger level="INFO" doc:name="Logger" doc:id="ebbc6138-b53c-4c8c-8e55-f00bd660c110" message="tokenRealitycs" />
+		<logger level="INFO" doc:name="Logger1" doc:id="a14d5cb4-de95-422f-a01b-470c2c42073f" message="#[%dw 2.0&#10;output application/x-www-form-urlencoded&#10;---&#10;{&#10;    &quot;grant_type&quot;: p('realitycs.grantType'),&#10;    &quot;username&quot;: p('realitycs.username'),&#10;    &quot;password&quot;: p('secure::realitycs.password')&#10;}]" />
+		<http:request method="GET" doc:name="Request" doc:id="e3dc2b31-e018-47c8-b968-76882378355e" config-ref="HTTP_Request_Realitycs_configuration" path="${realitycs.tipologie}" >
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	("Authorization" :"Bearer " ++ vars.token) if vars.token != null,
+	//"Content-Type" : "application/x-www-form-urlencoded"
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"latitudine" : attributes.queryParams.latitudine,
+	"longitudine" : attributes.queryParams.longitudine
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="745e8b14-33ed-45dd-911a-0cea7d134082" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger2" doc:id="178287da-afeb-472d-8fe1-7a183b86a60d" message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e268ef16-70fe-4fba-8586-c69e61f5df08" >
+				<logger level="INFO" doc:name="Logger" doc:id="6bedc969-e87a-4680-878e-3ad6cf2d53c0" message="#[payload]" />
+				<logger level="INFO" doc:name="Logger1" doc:id="760f7944-70e9-48c2-8085-020cc40a5001" message="#[error.description]" />
 			</on-error-propagate>
 		</error-handler>
 	</flow>

@@ -33,6 +33,16 @@ microsoftGraph:
   users: /users
   calendar: /calendarview
   postCalendar: /calendar/events
+
+realitycs:
+  protocol: https
+  host: dev-api.realitycs.it
+  token: /oauth/token
+  authorization: '![2rV8oeCvNB8xUv2tG8oEqR1DLhAEELuR84ciR5+qrIbo3PXlkqVUwfvRON31Qkyo]'
+  grantType: grant_type
+  username: info@facileimmobiliare.it
+  password: '![VpEzRG71K0Yj+e2KcgFnbw==]'
+  tipologie: /tipologie
     
 application:
   autodiscovery: '18611144'
