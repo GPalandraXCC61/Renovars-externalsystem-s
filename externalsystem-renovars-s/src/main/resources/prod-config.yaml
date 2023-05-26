@@ -43,6 +43,9 @@ realitycs:
   username: 
   password: '![]'
   tipologie: /tipologie
+  poi: /poi
+  smart: /smart
+  smartAffitto: /smart/affitto
               
 application:
   autodiscovery: '18611155'

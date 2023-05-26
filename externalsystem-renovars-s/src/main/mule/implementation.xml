@@ -945,4 +945,189 @@ payload]]></ee:set-payload>
 			</on-error-propagate>
 		</error-handler>
 	</flow>
+	<flow name="getPoi" doc:id="3eb056f2-55ce-4140-9b52-6deab551caa1" >
+		<flow-ref doc:name="Flow Reference" doc:id="78254561-3f71-4e05-a68f-3c6a3b4cefa1" name="tokenRealitycs" target="token" />
+		<logger level="INFO" doc:name="Logger" doc:id="8053ba3e-ea7b-449d-b130-dd52dcfde7fb" message="tokenRealitycs" />
+		<http:request method="GET" doc:name="Request" doc:id="8be6bc5c-b5dd-49d2-b273-778cc562ed80" config-ref="HTTP_Request_Realitycs_configuration" path="${realitycs.poi}" >
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	("Authorization" :"Bearer " ++ vars.token) if vars.token != null,
+	//"Content-Type" : "application/x-www-form-urlencoded"
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"latitudine" : attributes.queryParams.latitudine,
+	"longitudine" : attributes.queryParams.longitudine
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="dec5aac3-fe41-492e-9965-dd9582b27741" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger2" doc:id="2f077df9-65a3-4e4e-bf98-698fcc52c5c4" message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="5927b793-bc7a-42ed-bf74-2f3dcc73f4a9" >
+				<logger level="INFO" doc:name="Logger" doc:id="8f49315b-f9ef-4f4d-9c26-ba14fc5cbddf" message="#[payload]" />
+				<logger level="INFO" doc:name="Logger1" doc:id="ee2e1bbb-360c-4af7-be30-12ca5fd379be" message="#[error.description]" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="postSmart" doc:id="df03d447-868b-4a89-a7cc-061edc868475" >
+		<flow-ref doc:name="Flow Reference1" doc:id="5903af70-50e2-42f1-a08e-1ad73bc93227" name="initVars" />
+		<flow-ref doc:name="Flow Reference" doc:id="c4df29f5-e15c-4a22-a231-64a455b38464" name="tokenRealitycs" target="token" />
+		<logger level="INFO" doc:name="Logger" doc:id="7631fc60-2e78-48d4-a17b-d0a68fd757fa" message="tokenRealitycs" />
+		<ee:transform doc:name="Transform Message" doc:id="0c78b4ad-f275-469b-8907-38be11cdb848" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.request]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="f7f1a617-a0b6-4f16-bbb9-388c750d7b03" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"latitudine": payload.latitudine,&#10;	"longitudine": payload.longitudine,&#10;	"tipologia_id": payload.tipologiaId,&#10;	"stato": payload.stato,&#10;	"anno": payload.anno,&#10;	"superficie_mq": payload.superficieMq,&#10;	"piano": payload.piano,&#10;	"ascensore": payload.ascensore,&#10;	"balcone_mq": payload.balconeMq,&#10;	"garage_mq": payload.garageMq,&#10;	"giardino_mq": payload.giardinoMq,&#10;	"locali": payload.locali,&#10;	"riscaldamento": payload.riscaldamento,&#10;	"bagni": payload.bagni,&#10;	"classe_energetica": payload.classeEnergetica,&#10;	"indirizzo": payload.indirizzo,&#10;	"esposizione": payload.esposizione,&#10;	"panoramicita_distanza": payload.panoramicitaDistanza,&#10;	"panoramicita_qualita": payload.panoramicitaQualita,&#10;	"tipo_proprieta": payload.tipoProprieta,&#10;	"finiture_qualita": payload.finitureQualita,&#10;	"impianti_qualita": payload.impiantiQualita,&#10;	"cucina_valore": payload.cucinaValore,&#10;	"output": payload."output"&#10;}]'/>
+		<http:request method="POST" doc:name="Request" doc:id="3c342de4-89d9-436b-a410-1fa6053fa045" config-ref="HTTP_Request_Realitycs_configuration" path="${realitycs.smart}" >
+			<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	"latitudine": payload.latitudine,
+	"longitudine": payload.longitudine,
+	"tipologia_id": payload.tipologiaId,
+	"stato": payload.stato,
+	"anno": payload.anno,
+	"superficie_mq": payload.superficieMq,
+	"piano": payload.piano,
+	"ascensore": payload.ascensore,
+	"balcone_mq": payload.balconeMq,
+	"garage_mq": payload.garageMq,
+	"giardino_mq": payload.giardinoMq,
+	"locali": payload.locali,
+	"riscaldamento": payload.riscaldamento,
+	"bagni": payload.bagni,
+	"classe_energetica": payload.classeEnergetica,
+	"indirizzo": payload.indirizzo,
+	"esposizione": payload.esposizione,
+	"panoramicita_distanza": payload.panoramicitaDistanza,
+	"panoramicita_qualita": payload.panoramicitaQualita,
+	"tipo_proprieta": payload.tipoProprieta,
+	"finiture_qualita": payload.finitureQualita,
+	"impianti_qualita": payload.impiantiQualita,
+	"cucina_valore": payload.cucinaValore,
+	"output": payload."output"
+}]]]></http:body>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	("Authorization" :"Bearer " ++ vars.token) if vars.token != null,
+	"Content-Type" : "application/json"
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="0b2f5cec-8caf-4c8d-9d88-024a8259f626" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger1" doc:id="42acb96e-054e-4bf8-87f5-09bc8634337a" message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="3d775dad-c60e-4eed-991f-c8a610bfd0e2" >
+				<logger level="INFO" doc:name="Logger" doc:id="807dbaaa-0ef5-4a45-858f-d456426e44d8" message="#[payload]" />
+				<logger level="INFO" doc:name="Logger1" doc:id="48ffda70-132a-4c30-bb5d-1c78f38112af" message="#[error.description]" />
+				<ee:transform doc:name="Transform Message" doc:id="49955d95-156c-4a0a-b286-139ee82c7fdc" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.detailedDescription
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="postSmartAffitto" doc:id="66dfbc28-3e04-4715-b908-76f56592e98b" >
+		<flow-ref doc:name="Flow Reference" doc:id="e22117ee-c166-4eee-8fb4-fd1933fad72d" name="initVars"/>
+		<flow-ref doc:name="Flow Reference" doc:id="eebec76a-63e0-4db8-94e9-629980b37354" name="tokenRealitycs" target="token" />
+		<logger level="INFO" doc:name="Logger" doc:id="e9e169cc-da0a-4316-92d4-0b68f94c9078" message="tokenRealitycs" />
+		<ee:transform doc:name="Transform Message1" doc:id="e192b787-4a6b-4e16-b2b1-3e9dc9c4f6ee">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload.request]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="a3bbbc1c-8a2d-49f5-87bd-7a345db1aa92" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"latitudine": payload.latitudine,&#10;	"longitudine": payload.longitudine,&#10;	"tipologia_id": payload.tipologiaId,&#10;	"stato": payload.stato,&#10;	"anno": payload.anno,&#10;	"superficie_mq": payload.superficieMq,&#10;	"piano": payload.piano,&#10;	"ascensore": payload.ascensore,&#10;	"balcone_mq": payload.balconeMq,&#10;	"garage_mq": payload.garageMq,&#10;	"giardino_mq": payload.giardinoMq,&#10;	"locali": payload.locali,&#10;	"riscaldamento": payload.riscaldamento,&#10;	"bagni": payload.bagni,&#10;	"classe_energetica": payload.classeEnergetica,&#10;	"indirizzo": payload.indirizzo,&#10;	"esposizione": payload.esposizione,&#10;	"panoramicita_distanza": payload.panoramicitaDistanza,&#10;	"panoramicita_qualita": payload.panoramicitaQualita,&#10;	"tipo_proprieta": payload.tipoProprieta,&#10;	"finiture_qualita": payload.finitureQualita,&#10;	"impianti_qualita": payload.impiantiQualita,&#10;	"cucina_valore": payload.cucinaValore,&#10;	"output": payload."output"&#10;}]'/>
+		<http:request method="POST" doc:name="Request" doc:id="a7794177-bd61-478f-95b8-915ded8c5504" config-ref="HTTP_Request_Realitycs_configuration" path="${realitycs.smartAffitto}" >
+			<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	"latitudine": payload.latitudine,
+	"longitudine": payload.longitudine,
+	"tipologia_id": payload.tipologiaId,
+	"stato": payload.stato,
+	"anno": payload.anno,
+	"superficie_mq": payload.superficieMq,
+	"piano": payload.piano,
+	"ascensore": payload.ascensore,
+	"balcone_mq": payload.balconeMq,
+	"garage_mq": payload.garageMq,
+	"giardino_mq": payload.giardinoMq,
+	"locali": payload.locali,
+	"riscaldamento": payload.riscaldamento,
+	"bagni": payload.bagni,
+	"classe_energetica": payload.classeEnergetica,
+	"indirizzo": payload.indirizzo,
+	"esposizione": payload.esposizione,
+	"panoramicita_distanza": payload.panoramicitaDistanza,
+	"panoramicita_qualita": payload.panoramicitaQualita,
+	"tipo_proprieta": payload.tipoProprieta,
+	"finiture_qualita": payload.finitureQualita,
+	"impianti_qualita": payload.impiantiQualita,
+	"cucina_valore": payload.cucinaValore,
+	"output": payload."output"
+}]]]></http:body>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	("Authorization" :"Bearer " ++ vars.token) if vars.token != null,
+	"Content-Type" : "application/json"
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="69a2e559-f99b-4eba-84ad-6d5c7912e0bd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger1" doc:id="d4b1fd5f-c3a4-4dab-86a3-70b0a1717abc" message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="966f0ca9-d7a7-466b-a0bd-be3b727e088c" >
+				<logger level="INFO" doc:name="Logger" doc:id="324d32fd-7a2b-4a74-87bb-346236a513aa" message="#[payload]" />
+				<logger level="INFO" doc:name="Logger1" doc:id="cf285f55-206d-45e8-9d0d-bcb41bf9f944" message="#[error.description]" />
+				<ee:transform doc:name="Transform Message" doc:id="cd1091ad-c86d-4680-aa09-0ca5bbe1f39d" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.detailedDescription
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
 </mule>

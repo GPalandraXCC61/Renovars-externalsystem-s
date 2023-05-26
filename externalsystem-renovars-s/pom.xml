@@ -64,7 +64,7 @@
 		<dependency>
 			<groupId>9b82ee49-beb3-47b7-a619-0e05153193f5</groupId>
 			<artifactId>externalsystem-renovars-s-api</artifactId>
-			<version>1.0.27</version>
+			<version>1.0.29</version>
 			<classifier>raml</classifier>
 			<type>zip</type>
 		</dependency>

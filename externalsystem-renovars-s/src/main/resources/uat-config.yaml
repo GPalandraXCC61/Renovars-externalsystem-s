@@ -43,6 +43,9 @@ realitycs:
   username: info@facileimmobiliare.it
   password: '![VpEzRG71K0Yj+e2KcgFnbw==]'
   tipologie: /tipologie
+  poi: /poi
+  smart: /smart
+  smartAffitto: /smart/affitto
     
 application:
   autodiscovery: '18611144'
