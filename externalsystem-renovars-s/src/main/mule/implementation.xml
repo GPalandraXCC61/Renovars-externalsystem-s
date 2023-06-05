@@ -708,20 +708,52 @@ output multipart/form-data
         }
     }
 }]]]></http:body>
+			<http:response-validator >
+				<http:success-status-code-validator values="200..499"/>
+			</http:response-validator>
 		</http:request>
-		<ee:transform doc:name="Transform Message" doc:id="393cb7ee-8311-4974-b9cd-3c3017f46e82" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
+		<choice doc:name="Choice" doc:id="40003fe1-210d-4d83-8cae-8276098c29a0" >
+			<when expression="#[payload.access_token != null]">
+				<ee:transform doc:name="Transform Message" doc:id="393cb7ee-8311-4974-b9cd-3c3017f46e82">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
 output application/java
 ---
 if (payload.token_type != null) payload.token_type ++ " " ++ payload.access_token else payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="aa4587cf-a50c-498c-9251-25bf86e46018" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Error authentication",
+	"status": attributes.statusCode,
+	"error": true
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
 		<logger level="INFO" doc:name="Logger" doc:id="21f517e5-75fa-4035-84b3-d933330bad95" message="#[payload]" />
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6dc37fba-ff0d-4e38-a5ca-f99c538ca61f" >
-				<logger level="INFO" doc:name="Logger" doc:id="0ddeac04-f0e4-46e4-a140-5b1330922f30" message="#[payload]" />
 				<logger level="INFO" doc:name="Logger1" doc:id="3c1459ea-20a4-47bd-9a9d-d1bb932073b4" message="#[error]" />
+				<ee:transform doc:name="Transform Message" doc:id="2038044b-4e91-45a5-91ae-eab91315042c" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.detailedDescription,
+	"status": error.muleMessage.attributes.StatusCode
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="0ddeac04-f0e4-46e4-a140-5b1330922f30" message="#[payload]" />
 			</on-error-propagate>
 		</error-handler>
 	</flow>
@@ -751,7 +783,8 @@ payload]]></ee:set-payload>
 output application/json
 ---
 {
-	"message": error.detailedDescription
+	"message": error.detailedDescription,
+	"status": error.muleMessage.attributes.StatusCode
 }]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
@@ -785,7 +818,8 @@ payload]]></ee:set-payload>
 output application/json
 ---
 {
-	"message": error.detailedDescription
+	"message": error.detailedDescription,
+	"status": error.muleMessage.attributes.StatusCode
 }]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
@@ -829,7 +863,8 @@ payload]]></ee:set-payload>
 output application/json
 ---
 {
-	"message": error.detailedDescription
+	"message": error.detailedDescription,
+	"status": error.muleMessage.attributes.StatusCode
 }]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
@@ -839,19 +874,61 @@ output application/json
 	<flow name="postCalendar" doc:id="e426cc57-e53b-4977-85ba-6e7e0064bca7" >
 		<flow-ref doc:name="Flow Reference" doc:id="e01a050c-6d09-4162-86d2-8daebd7a08ba" name="tokenMicrosoftToken" target="token" />
 		<logger level="INFO" doc:name="Logger" doc:id="39f1c1ca-dc66-47ce-9170-9550015de851" message="#[payload.request]"/>
-		<http:request method="POST" doc:name="Request" doc:id="24df65a3-3eff-4822-8eed-a9072998139f" config-ref="HTTP_Request_configuration" path="${microsoftGraph.version}${microsoftGraph.users}/{id}${microsoftGraph.postCalendar}" >
-			<http:body ><![CDATA[#[payload.request]]]></http:body>
-			<http:headers ><![CDATA[#[output application/java
+		<choice doc:name="Choice" doc:id="b91e2864-4fc8-42e4-b7a5-b843f057ad6b" >
+			<when expression="#[vars.token.error != true]">
+				<http:request method="POST" doc:name="Request" doc:id="24df65a3-3eff-4822-8eed-a9072998139f" config-ref="HTTP_Request_configuration" path="${microsoftGraph.version}${microsoftGraph.users}/{id}${microsoftGraph.postCalendar}">
+			<http:body><![CDATA[#[payload.request]]]></http:body>
+			<http:headers><![CDATA[#[output application/java
 ---
 {
 	"Authorization" : vars.token
 }]]]></http:headers>
-			<http:uri-params ><![CDATA[#[output application/java
+			<http:uri-params><![CDATA[#[output application/java
 ---
 {
 	"id" : attributes.uriParams.'id'
 }]]]></http:uri-params>
+			<http:response-validator>
+				<http:success-status-code-validator values="200..499" />
+			</http:response-validator>
 		</http:request>
+				<logger level="INFO" doc:name="Logger" doc:id="4f8daaec-6163-435a-8faf-965ef8747919" message="dopo request" />
+				<choice doc:name="Choice" doc:id="5c1f0fbf-7349-40fb-9d1b-6792494f2823" >
+					<when expression="#[output application/java&#10;---&#10;attributes.statusCode == 200]">
+						<logger level="INFO" doc:name="Logger" doc:id="7c63f76c-309d-4a30-a0f4-4340ab97f82a" message="statusCode == 200"/>
+					</when>
+					<otherwise >
+						<ee:transform doc:name="Transform Message" doc:id="fa7a9d6b-5a70-4225-ad02-12a018bb8bc8" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Error authentication",
+	"status": vars.token.status,
+	"error": true
+}]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+					</otherwise>
+				</choice>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="7436e739-208a-4403-b684-b5eb0f4dcde2" message="#[payload]"/>
+				<ee:transform doc:name="Transform Message" doc:id="ebcc59b3-5953-4a0f-892d-18ae54dfc60e" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Error authentication",
+	"status": vars.token.status,
+	"error": true
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
 		<ee:transform doc:name="Transform Message" doc:id="7ddbe3d2-4edf-4ac6-9ac7-9f86f422b4f8" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -869,10 +946,12 @@ payload]]></ee:set-payload>
 output application/json
 ---
 {
-	"message": error.detailedDescription
+	"message": error.detailedDescription,
+	"status": error.muleMessage.attributes.StatusCode
 }]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
+				<logger level="INFO" doc:name="Logger1" doc:id="e1bb0c46-92cf-4225-9b8b-02b59da9115b" message="#[payload]" />
 			</on-error-propagate>
 		</error-handler>
 	</flow>
@@ -1118,6 +1197,45 @@ payload]]></ee:set-payload>
 				<logger level="INFO" doc:name="Logger" doc:id="324d32fd-7a2b-4a74-87bb-346236a513aa" message="#[payload]" />
 				<logger level="INFO" doc:name="Logger1" doc:id="cf285f55-206d-45e8-9d0d-bcb41bf9f944" message="#[error.description]" />
 				<ee:transform doc:name="Transform Message" doc:id="cd1091ad-c86d-4680-aa09-0ca5bbe1f39d" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.detailedDescription
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="wikiCasaGetProperty" doc:id="91623dfc-5304-4963-af89-63014927ec36" >
+		<flow-ref doc:name="Flow Reference" doc:id="b8eae42d-8a06-4911-a2cf-4a25757ce3c3" name="initVars" />
+		<flow-ref doc:name="Flow Reference token" doc:id="8ffb7e0b-4c06-4f4d-bc24-9dd4f03b0086" name="wikiCasaSSOTokenForProvider" target="wikiCasaSSOToken" />
+		<logger level="INFO" doc:name="Logger" doc:id="0832713b-3c2b-434c-a136-8497fd892973" message="#[vars.wikiCasaSSOToken]" />
+		<logger level="INFO" doc:name="Logger1" doc:id="9ae6fe54-e669-408f-ae9e-fd780855ffc2" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] get wikicasa Property request']" />
+		<http:request method="GET" doc:name="Request" doc:id="b6c098f8-31c5-4b17-a049-ca83aa564769" config-ref="HTTP_Request_configuration_WikiCasa" path="${wikiCasa.basePath}${wikiCasa.realEstateManagement.path}/{id}" >
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	("Authorization" : "Bearer " ++ vars.wikiCasaSSOToken) if vars.wikiCasaSSOToken != null,
+	"Content-Type" : "application/json"
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"id" : attributes.uriParams.'id',
+}]]]></http:uri-params>
+			<http:response-validator >
+				<http:success-status-code-validator values="200..500" />
+			</http:response-validator>
+		</http:request>
+		<logger level="INFO" doc:name="Logger2" doc:id="835810d8-8b46-4b2c-93c8-6fa8ac4737d4" message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="247b0a60-96b0-494e-835f-2fb1299002ee" >
+				<logger level="INFO" doc:name="Logger" doc:id="0cfc213d-cf1f-4b84-9825-a41c650a0b07" message="#[payload]" />
+				<logger level="INFO" doc:name="Logger1" doc:id="1de02630-da20-488a-9ccd-805c76263ed4" message="#[error.errorMessage]" />
+				<ee:transform doc:name="Transform Message" doc:id="2a944957-59b2-4bf8-ad13-d92074a2b83d" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
