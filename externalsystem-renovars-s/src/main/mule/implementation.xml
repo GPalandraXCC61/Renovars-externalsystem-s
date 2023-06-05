@@ -692,13 +692,13 @@ output multipart/form-data
             headers: {
                 "Content-Disposition": "form-data; name=\"client_id\""
             },
-            content: "dcc2b3da-56fc-42ad-97bf-2f0dcc39a50d"
+            content: "f701b034-cbed-4e76-a195-ffacc51e76d2"
         },
         client_secret: {
             headers: {
                 "Content-Disposition": "form-data; name=\"client_secret\""
             },
-            content: "Z9E8Q~NJkDufMWmcRSBZ5sLnCChED2ne2md3Dbrh"
+            content: "alU8Q~mNj363dMkNX8rMpMVEY3HmZAeevWm2edu~"
         },
         scope: {
             headers: {
@@ -1210,7 +1210,7 @@ output application/json
 		</error-handler>
 	</flow>
 	<flow name="wikiCasaGetProperty" doc:id="91623dfc-5304-4963-af89-63014927ec36" >
-		<flow-ref doc:name="Flow Reference" doc:id="b8eae42d-8a06-4911-a2cf-4a25757ce3c3" name="initVars" />
+		<set-variable value="#[attributes.header.fName default '']" doc:name="Set Variable" doc:id="6874524c-2ae2-40d8-9f85-b086cdc19781" variableName="fname" />
 		<flow-ref doc:name="Flow Reference token" doc:id="8ffb7e0b-4c06-4f4d-bc24-9dd4f03b0086" name="wikiCasaSSOTokenForProvider" target="wikiCasaSSOToken" />
 		<logger level="INFO" doc:name="Logger" doc:id="0832713b-3c2b-434c-a136-8497fd892973" message="#[vars.wikiCasaSSOToken]" />
 		<logger level="INFO" doc:name="Logger1" doc:id="9ae6fe54-e669-408f-ae9e-fd780855ffc2" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] get wikicasa Property request']" />
