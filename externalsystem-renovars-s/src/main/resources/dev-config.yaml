@@ -33,6 +33,9 @@ microsoftGraph:
   users: /users
   calendar: /calendarview
   postCalendar: /calendar/events
+  clientId: dcc2b3da-56fc-42ad-97bf-2f0dcc39a50d
+  clientSecret: '![jqblosrfO0thdv2JMBJE0ZK6s1BzaoQ36k2PSfsGUWq0MoTVZTXMPZVZizZDQ0Rz]'
+  
 
 realitycs:
   protocol: https
@@ -46,6 +49,19 @@ realitycs:
   poi: /poi
   smart: /smart
   smartAffitto: /smart/affitto
+
+immobiliare:
+    protocol: http
+    host: feed.immobiliare.it
+    port: '8081'
+    basePath: /ws/import/immobiliare
+    authorization: '![2rV8oeCvNB8xUv2tG8oEqWxbaUqnPbLZIqibKwMO3snNg2P0tF7j3ZY7f2Q1s9cP]'
+    ximmosource: facileimmobiliarexc-ws
+    immobile:
+      path: /property
+    agente:
+      path: /company/realtor
+    contentType: text/xml
   
   
         

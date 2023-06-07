@@ -19,6 +19,9 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	<http:request-config name="HTTP_Request_configuration_WikiCasa" doc:name="HTTP Request configuration" doc:id="7ddebe52-7776-47cb-96cc-6e740f6a7574" >
 		<http:request-connection protocol="HTTPS" host="${wikiCasa.host}" connectionIdleTimeout="120000"/>
 	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_immobiliare" doc:name="HTTP Request configuration" doc:id="41b0a549-b2c6-4b6f-ba7c-2a7540e88064" >
+		<http:request-connection host="${immobiliare.host}" connectionIdleTimeout="120000"/>
+	</http:request-config>
 	
 
 </mule>

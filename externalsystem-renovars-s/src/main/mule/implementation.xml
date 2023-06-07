@@ -692,13 +692,13 @@ output multipart/form-data
             headers: {
                 "Content-Disposition": "form-data; name=\"client_id\""
             },
-            content: "f701b034-cbed-4e76-a195-ffacc51e76d2"
+            content: p('microsoftGraph.clientId')
         },
         client_secret: {
             headers: {
                 "Content-Disposition": "form-data; name=\"client_secret\""
             },
-            content: "alU8Q~mNj363dMkNX8rMpMVEY3HmZAeevWm2edu~"
+            content: p('secure::microsoftGraph.clientSecret')
         },
         scope: {
             headers: {
@@ -1247,5 +1247,18 @@ output application/json
 				</ee:transform>
 			</on-error-propagate>
 		</error-handler>
+	</flow>
+	<flow name="immobiliarePutProperty" doc:id="8003add9-b25f-48b7-a16b-f952bc798c99" >
+		<flow-ref doc:name="Flow Reference" doc:id="ec29b9bf-e56c-47ce-8c5e-cde2c5f674c5" name="initVars" />
+		<logger level="INFO" doc:name="Logger" doc:id="c3d24151-ca3c-4c99-9541-983314c7a52a" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] delete wikicasa Property request: [' ++ (write(payload default '', &quot;application/json&quot;)) ++ ']']" />
+		<ee:transform doc:name="Transform Message" doc:id="c1fd0efd-5624-4426-81db-1ba261719508" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="PUT" doc:name="Request" doc:id="7fe30dfa-c240-48b3-bee9-5434d7c46619" config-ref="HTTP_Request_configuration_immobiliare" path="${immobiliare.basePath}${immobiliare.immobile.path}"/>
 	</flow>
 </mule>
