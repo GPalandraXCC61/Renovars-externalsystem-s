@@ -729,11 +729,7 @@ if (payload.token_type != null) payload.token_type ++ " " ++ payload.access_toke
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
-{
-	"message": "Error authentication",
-	"status": attributes.statusCode,
-	"error": true
-}]]></ee:set-payload>
+"error"]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
 			</otherwise>
@@ -875,7 +871,7 @@ output application/json
 		<flow-ref doc:name="Flow Reference" doc:id="e01a050c-6d09-4162-86d2-8daebd7a08ba" name="tokenMicrosoftToken" target="token" />
 		<logger level="INFO" doc:name="Logger" doc:id="39f1c1ca-dc66-47ce-9170-9550015de851" message="#[payload.request]"/>
 		<choice doc:name="Choice" doc:id="b91e2864-4fc8-42e4-b7a5-b843f057ad6b" >
-			<when expression="#[vars.token.error != true]">
+			<when expression='#[vars.token != "error"]'>
 				<http:request method="POST" doc:name="Request" doc:id="24df65a3-3eff-4822-8eed-a9072998139f" config-ref="HTTP_Request_configuration" path="${microsoftGraph.version}${microsoftGraph.users}/{id}${microsoftGraph.postCalendar}">
 			<http:body><![CDATA[#[payload.request]]]></http:body>
 			<http:headers><![CDATA[#[output application/java
@@ -893,25 +889,26 @@ output application/json
 			</http:response-validator>
 		</http:request>
 				<logger level="INFO" doc:name="Logger" doc:id="4f8daaec-6163-435a-8faf-965ef8747919" message="dopo request" />
-				<choice doc:name="Choice" doc:id="5c1f0fbf-7349-40fb-9d1b-6792494f2823" >
-					<when expression="#[output application/java&#10;---&#10;attributes.statusCode == 200]">
+<!-- [STUDIO:"Choice"]				<choice doc:name="Choice" doc:id="5c1f0fbf-7349-40fb-9d1b-6792494f2823" >
+					<when expression="#[output application/java&#10;&#45;&#45;-&#10;attributes.statusCode == 200&#93;">
 						<logger level="INFO" doc:name="Logger" doc:id="7c63f76c-309d-4a30-a0f4-4340ab97f82a" message="statusCode == 200"/>
 					</when>
 					<otherwise >
-						<ee:transform doc:name="Transform Message" doc:id="fa7a9d6b-5a70-4225-ad02-12a018bb8bc8" >
-							<ee:message >
-								<ee:set-payload ><![CDATA[%dw 2.0
+						<ee:transform doc:name="Transform Message" doc:id="fa7a9d6b-5a70-4225-ad02-12a018bb8bc8">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
 output application/json
----
+&#45;&#45;-
 {
 	"message": "Error authentication",
-	"status": vars.token.status,
+	//"status": "500",
 	"error": true
-}]]></ee:set-payload>
+}&#93;&#93;></ee:set-payload>
 							</ee:message>
 						</ee:transform>
 					</otherwise>
-				</choice>
+				
+</choice> [STUDIO] -->
 			</when>
 			<otherwise >
 				<logger level="INFO" doc:name="Logger" doc:id="7436e739-208a-4403-b684-b5eb0f4dcde2" message="#[payload]"/>
