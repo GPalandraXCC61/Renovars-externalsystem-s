@@ -8,7 +8,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	<http:request-config name="HTTP_Request_microsoftGraph_token_configuration" doc:name="HTTP Request configuration" doc:id="bffc083f-c159-4400-9ffc-139075dd0fc5" >
 		<http:request-connection protocol="HTTPS" host="${microsoftGraph.tokenUrl}" />
 	</http:request-config>
-	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="bf9a7fe5-e2f7-4702-8c25-7209f3a7cd0e" >
+	<http:request-config name="HTTP_Request_microsoftGraph_configuration" doc:name="HTTP Request configuration" doc:id="bf9a7fe5-e2f7-4702-8c25-7209f3a7cd0e" >
 		<http:request-connection host="${microsoftGraph.graphUrl}" protocol="HTTPS"/>
 	</http:request-config>
 	<http:request-config name="HTTP_Request_Realitycs_configuration" doc:name="HTTP Request configuration" doc:id="1e9805d3-21ea-4f0f-bad4-e8b8f5000ed0" >
@@ -755,7 +755,7 @@ output application/json
 	</flow>
 	<flow name="getUsers" doc:id="2f322ad5-8170-4671-9161-c15a7767c9ab" >
 		<flow-ref doc:name="Flow Reference" doc:id="bea79a4e-7fe1-4ad0-af56-c366a7046b72" name="tokenMicrosoftToken" target="token"/>
-		<http:request method="GET" doc:name="Request" doc:id="9946978a-0c56-4315-b08b-e6198a5acbf4" config-ref="HTTP_Request_configuration" path="${microsoftGraph.version}${microsoftGraph.users}">
+		<http:request method="GET" doc:name="Request" doc:id="9946978a-0c56-4315-b08b-e6198a5acbf4" config-ref="HTTP_Request_microsoftGraph_configuration" path="${microsoftGraph.version}${microsoftGraph.users}">
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
@@ -824,7 +824,7 @@ output application/json
 	</flow>
 	<flow name="getCalendar" doc:id="d94457ae-dd6c-48c4-a943-f97bb7c42e3f" >
 		<flow-ref doc:name="Flow Reference" doc:id="365eb4d7-001b-4010-9254-ae8167a769a1" name="tokenMicrosoftToken" target="token" />
-		<http:request method="GET" doc:name="Request" doc:id="f6cf5982-6650-4ff1-a8d7-20a583557df3" config-ref="HTTP_Request_configuration" path="${microsoftGraph.version}${microsoftGraph.users}/{id}${microsoftGraph.calendar}" >
+		<http:request method="GET" doc:name="Request" doc:id="f6cf5982-6650-4ff1-a8d7-20a583557df3" config-ref="HTTP_Request_microsoftGraph_configuration" path="${microsoftGraph.version}${microsoftGraph.users}/{id}${microsoftGraph.calendar}" >
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
@@ -870,9 +870,10 @@ output application/json
 	<flow name="postCalendar" doc:id="e426cc57-e53b-4977-85ba-6e7e0064bca7" >
 		<flow-ref doc:name="Flow Reference" doc:id="e01a050c-6d09-4162-86d2-8daebd7a08ba" name="tokenMicrosoftToken" target="token" />
 		<logger level="INFO" doc:name="Logger" doc:id="39f1c1ca-dc66-47ce-9170-9550015de851" message="#[payload.request]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="ccbb19ab-077c-480d-91b7-82f0ec177e37" message="#[vars.token]"/>
 		<choice doc:name="Choice" doc:id="b91e2864-4fc8-42e4-b7a5-b843f057ad6b" >
 			<when expression='#[vars.token != "error"]'>
-				<http:request method="POST" doc:name="Request" doc:id="24df65a3-3eff-4822-8eed-a9072998139f" config-ref="HTTP_Request_configuration" path="${microsoftGraph.version}${microsoftGraph.users}/{id}${microsoftGraph.postCalendar}">
+				<http:request method="POST" doc:name="Request" doc:id="24df65a3-3eff-4822-8eed-a9072998139f" config-ref="HTTP_Request_microsoftGraph_configuration" path="${microsoftGraph.version}${microsoftGraph.users}/{id}${microsoftGraph.postCalendar}">
 			<http:body><![CDATA[#[payload.request]]]></http:body>
 			<http:headers><![CDATA[#[output application/java
 ---
@@ -1257,5 +1258,145 @@ payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		<http:request method="PUT" doc:name="Request" doc:id="7fe30dfa-c240-48b3-bee9-5434d7c46619" config-ref="HTTP_Request_configuration_immobiliare" path="${immobiliare.basePath}${immobiliare.immobile.path}"/>
+	</flow>
+	<flow name="getEventDelta" doc:id="8908e493-4013-4779-a9d0-a7a99dd79f71" >
+		<flow-ref doc:name="Flow Reference" doc:id="b91a2dac-041a-412e-97c5-1e616e6d9366" name="tokenMicrosoftToken" target="token" />
+		<choice doc:name="Choice" doc:id="e00765d0-d068-41e2-8781-13928b28f8b2" >
+			<when expression='#[vars.token != "error"]'>
+				<http:request method="GET" doc:name="Request" doc:id="0dcdf261-a902-447a-b99e-cd78a05b3c5d" config-ref="HTTP_Request_microsoftGraph_configuration" path="${microsoftGraph.version}${microsoftGraph.users}/{id}${microsoftGraph.calendar}/delta" >
+					<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.token
+}]]]></http:headers>
+					<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"id" : attributes.uriParams.'id'
+}]]]></http:uri-params>
+					<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"enddatetime" : attributes.queryParams.enddatetime,
+	"startdatetime" : attributes.queryParams.startdatetime
+}]]]></http:query-params>
+				</http:request>
+				<logger level="INFO" doc:name="Logger" doc:id="90e23152-3269-48e9-a100-144f28a27017" message="dopo request" />
+				<ee:transform doc:name="Transform Message" doc:id="5086db29-e251-4f51-95cf-001529d59ad9" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+ "value": payload.value map (item, index) -> {
+    "id":  item.id, 
+    "isCancelled": item.isCancelled,
+    "stardate":item.start,
+    "endate": item.end
+    },
+    "@odata.deltaLink" : payload."@odata.deltaLink",
+    "@odata.context":   payload."@odata.context",
+    "@odata.nextLink": payload."@odata.nextLink"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="012e7596-28cf-4f59-8679-0f2b91c7a8c1" message="#[payload]" />
+				<ee:transform doc:name="Transform Message" doc:id="ace0cbc5-8287-405d-8064-909b3bc0a3b4" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Error authentication",
+	"status": vars.token.status,
+	"error": true
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="Transform Message" doc:id="8f47cb5f-3c07-4a44-8bf1-6c735aeaba5e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="cbcc5468-d10c-4cc1-9c70-3519cebd11a0" >
+				<logger level="INFO" doc:name="Logger" doc:id="b481fe1e-af97-438b-b80f-830369cfc493" message="#[error.detailedDescription]" />
+				<ee:transform doc:name="Transform Message" doc:id="81ed7470-c6cc-432a-8b67-94caa8ff9633" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.detailedDescription,
+	"status": error.muleMessage.attributes.StatusCode
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger1" doc:id="88cc3104-2947-4695-8a3c-00ffc407b202" message="#[payload]" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="postEventDeltaLink" doc:id="3d8cd21d-4cf8-4f3c-9947-5105cdc1a548" >
+		<flow-ref doc:name="Flow Reference" doc:id="8bf63239-9967-4130-ae2c-c6f8f1b161fd" name="tokenMicrosoftToken" target="token" />
+		<logger level="INFO" doc:name="Logger" doc:id="4ae3bb29-9f36-4142-bad0-02c1b0580853" message="#[payload.request.url]"/>
+		<choice doc:name="Choice" doc:id="0ed79615-ad21-4eb2-b616-1582352cad66" >
+			<when expression='#[vars.token != "error"]'>
+				<http:request method="GET" doc:name="Request" doc:id="1936ea49-ad9c-431e-bccf-0e7be8382105" url="#[payload.request.url]">
+					<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.token
+}]]]></http:headers>
+				</http:request>
+				<logger level="INFO" doc:name="Logger" doc:id="28763f4e-99dc-475b-a087-f741f8fe49aa" message="dopo request" />
+				<ee:transform doc:name="Transform Message" doc:id="11ac770f-a232-4965-bc50-50e51d539957" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+ "value": payload.value map (item, index) -> {
+    "id":  item.id, 
+    "isCancelled": item.isCancelled,
+    "stardate":item.start,
+    "endate": item.end
+    },
+    "@odata.deltaLink" : payload."@odata.deltaLink",
+    "@odata.context":   payload."@odata.context",
+    "@odata.nextLink": payload."@odata.nextLink"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="3524a006-0d00-4feb-a9fc-a59a693e1cc2" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Error authentication",
+	"status": vars.token.status,
+	"error": true
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="Transform Message" doc:id="7d770634-0f03-43db-9e2c-f803f6ce3826" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 	</flow>
 </mule>

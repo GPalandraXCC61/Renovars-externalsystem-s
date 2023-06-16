@@ -1,0 +1,11 @@
+%dw 2.0
+
+type auto_3d8cd21d_4cf8_4f3c_9947_5105cdc1a548_Input_Payload = {|
+  status: String, 
+  message: String, 
+  "type": String, 
+  detail: String, 
+  timestamp: String, 
+  id: String
+|}
+
