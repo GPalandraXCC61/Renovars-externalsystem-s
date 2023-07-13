@@ -1291,8 +1291,9 @@ output application/json
  "value": payload.value map (item, index) -> {
     "id":  item.id, 
     "isCancelled": item.isCancelled,
-    "stardate":item.start,
-    "endate": item.end
+    "stardate":item.start.dateTime,
+    "endate": item.end.dateTime,
+    "subject": item.subject
     },
     "@odata.deltaLink" : payload."@odata.deltaLink",
     "@odata.context":   payload."@odata.context",
@@ -1365,8 +1366,9 @@ output application/json
  "value": payload.value map (item, index) -> {
     "id":  item.id, 
     "isCancelled": item.isCancelled,
-    "stardate":item.start,
-    "endate": item.end
+    "stardate":item.start.dateTime,
+    "endate": item.end.dateTime,
+    "subject": item.subject
     },
     "@odata.deltaLink" : payload."@odata.deltaLink",
     "@odata.context":   payload."@odata.context",
@@ -1398,5 +1400,52 @@ output application/json
 payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+	</flow>
+	<flow name="GetEventWhitICalUId" doc:id="30f225cc-3c6e-4268-8cee-83d36a17a28b" >
+		<flow-ref doc:name="Flow Reference" doc:id="4a8db3ab-08db-4949-b416-37805e357823" name="tokenMicrosoftToken" target="token" />
+		<logger level="INFO" doc:name="Logger" doc:id="b642c16e-2920-4490-adef-e24d3c8a3a16" message="#[output application/json&#10;---&#10;{&#10;	'filter' : 'iCalUId eq ' ++ '\'' ++ attributes.queryParams.iCalUId ++ '\''&#10;}]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="fa4af5df-4224-4805-a8a5-c34ef08454e0" />
+		<http:request method="GET" doc:name="Request" doc:id="c1c9c500-fcb6-44a9-9c01-ee2a4b011056" config-ref="HTTP_Request_microsoftGraph_configuration" path="${microsoftGraph.version}${microsoftGraph.users}/{id}${microsoftGraph.events}" >
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.token
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"id" : attributes.uriParams.'id'
+}]]]></http:uri-params>
+			<http:query-params ><![CDATA[#[output application/json
+---
+{
+	'filter' : 'iCalUId eq ' ++ '\'' ++ attributes.queryParams.iCalUId ++ '\''
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="c906ffdf-57b7-48f5-8e28-cfbc4d41dcac" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="41fd44a1-d50e-4fb6-aa2e-550821db1eee" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="a94a40a5-081c-41a6-a9f3-99d388475532" >
+				<logger level="INFO" doc:name="Logger" doc:id="17e5d009-7afa-4834-9279-3460f00076d7" message="#[error]" />
+				<ee:transform doc:name="Transform Message" doc:id="0f407696-0bc2-407b-bda1-b6217b19e5d0" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.detailedDescription,
+	"status": error.muleMessage.attributes.StatusCode
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
 	</flow>
 </mule>

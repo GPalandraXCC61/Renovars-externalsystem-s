@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
     <http:listener-config name="externalsystem-renovars-s-api-httpListenerConfig">
-        <http:listener-connection host="0.0.0.0" port="8081" readTimeout="120000" />
+        <http:listener-connection host="0.0.0.0" port="8081" readTimeout="120000" connectionIdleTimeout="60000"/>
     </http:listener-config>
-    <apikit:config name="externalsystem-renovars-s-api-config" api="resource::9b82ee49-beb3-47b7-a619-0e05153193f5:externalsystem-renovars-s-api:1.0.39:raml:zip:externalsystem-renovars-s-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="externalsystem-renovars-s-api-config" api="resource::9b82ee49-beb3-47b7-a619-0e05153193f5:externalsystem-renovars-s-api:1.0.41:raml:zip:externalsystem-renovars-s-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="externalsystem-renovars-s-api-main">
         <http:listener config-ref="externalsystem-renovars-s-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -229,9 +229,12 @@ output application/json
         <flow-ref doc:name="Flow Reference" doc:id="255f9723-f05d-4c8f-8c31-45dbd73c5e61" name="wikiCasaGetProperty" />
     </flow>
     <flow name="get:\microsoftgraph\(id)\eventsDelta:externalsystem-renovars-s-api-config">
-		<flow-ref doc:name="Flow Reference" doc:id="b3ae623e-9195-43da-8a10-ac2a1f70b954" name="getEventDelta"/>
+        <flow-ref doc:name="Flow Reference" doc:id="b3ae623e-9195-43da-8a10-ac2a1f70b954" name="getEventDelta" />
     </flow>
     <flow name="post:\microsoftgraph\(id)\eventsDeltaLink:application\json:externalsystem-renovars-s-api-config">
-		<flow-ref doc:name="Flow Reference" doc:id="3205749d-bc00-42a7-bbcf-2ded747cbc7b" name="postEventDeltaLink"/>
+        <flow-ref doc:name="Flow Reference" doc:id="3205749d-bc00-42a7-bbcf-2ded747cbc7b" name="postEventDeltaLink" />
+    </flow>
+    <flow name="get:\microsoftgraph\(id)\events\id:externalsystem-renovars-s-api-config">
+		<flow-ref doc:name="Flow Reference" doc:id="fe4dd420-ebe8-4eb7-a23d-9a73301339fc" name="GetEventWhitICalUId"/>
     </flow>
 </mule>

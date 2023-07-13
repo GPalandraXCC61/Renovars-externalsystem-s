@@ -32,6 +32,7 @@ microsoftGraph:
   version: /v1.0
   users: /users
   calendar: /calendarview
+  events: /events
   postCalendar: /calendar/events
   clientId: dcc2b3da-56fc-42ad-97bf-2f0dcc39a50d
   clientSecret: '![jqblosrfO0thdv2JMBJE0ZK6s1BzaoQ36k2PSfsGUWq0MoTVZTXMPZVZizZDQ0Rz]'
