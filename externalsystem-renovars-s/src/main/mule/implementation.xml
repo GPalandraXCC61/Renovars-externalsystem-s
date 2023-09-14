@@ -920,7 +920,7 @@ output application/json
 ---
 {
 	"message": "Error authentication",
-	"status": vars.token.status,
+	"status": 401,
 	"error": true
 }]]></ee:set-payload>
 					</ee:message>
@@ -1311,7 +1311,7 @@ output application/json
 ---
 {
 	"message": "Error authentication",
-	"status": vars.token.status,
+	"status": 401,
 	"error": true
 }]]></ee:set-payload>
 					</ee:message>
@@ -1347,9 +1347,9 @@ output application/json
 	<flow name="postEventDeltaLink" doc:id="3d8cd21d-4cf8-4f3c-9947-5105cdc1a548" >
 		<flow-ref doc:name="Flow Reference" doc:id="8bf63239-9967-4130-ae2c-c6f8f1b161fd" name="tokenMicrosoftToken" target="token" />
 		<logger level="INFO" doc:name="Logger" doc:id="4ae3bb29-9f36-4142-bad0-02c1b0580853" message="#[payload.request.url]"/>
-		<choice doc:name="Choice" doc:id="0ed79615-ad21-4eb2-b616-1582352cad66" >
+		<choice doc:name="Check error" doc:id="0ed79615-ad21-4eb2-b616-1582352cad66" >
 			<when expression='#[vars.token != "error"]'>
-				<http:request method="GET" doc:name="Request" doc:id="1936ea49-ad9c-431e-bccf-0e7be8382105" url="#[payload.request.url]">
+				<http:request method="GET" doc:name="Request only url" doc:id="1936ea49-ad9c-431e-bccf-0e7be8382105" url="#[payload.request.url]">
 					<http:headers ><![CDATA[#[output application/java
 ---
 {
@@ -1385,7 +1385,7 @@ output application/json
 ---
 {
 	"message": "Error authentication",
-	"status": vars.token.status,
+	"status": 401,
 	"error": true
 }]]></ee:set-payload>
 					</ee:message>

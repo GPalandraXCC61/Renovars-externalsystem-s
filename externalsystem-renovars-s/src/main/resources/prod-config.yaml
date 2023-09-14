@@ -17,7 +17,7 @@ wikiCasa:
     authorization: ''
     pathssoTokenForProvider: /auth/ssoTokenForProvider
     PublicKey: pubkey-FacileImmobiliare_provider
-    PrivateKey: '![X2cM1wzxG/ZEvsaLsq8NzBlSmDrya6mUIPPeJkPVil6VpubWrkBr/lNQoa0KyMiL/jVli3bB07ymZAY+9g6PhA0gwcUj1anzmpktOlO9zPE=]'
+    PrivateKey: '![]'
     realEstateManagement:
       path: /realEstateWS
     agents:
@@ -28,14 +28,14 @@ wikiCasa:
 microsoftGraph:
   tokenUrl: login.microsoftonline.com
   graphUrl: graph.microsoft.com
-  tenantID: '41626452-eba2-41bc-be57-b41addba41e1'
+  tenantID: 'a10eef83-cd5f-4430-93e7-c6b6a7551368'
   version: /v1.0
   users: /users
   calendar: /calendarview
   events: /events
   postCalendar: /calendar/events
-  clientId: dcc2b3da-56fc-42ad-97bf-2f0dcc39a50d
-  clientSecret: '![]'
+  clientId: '8ed58fae-6274-4f6b-9951-543e6fb1cb77'
+  clientSecret: '![fB+FYHKdFKd/tGGOoNAzCWprq/uZp0m9RhzOw5n/a32LPm87a360XcVoQPJCTTRz]'
   
 realitycs:
   protocol: https
@@ -43,7 +43,7 @@ realitycs:
   token: /oauth/token
   authorization: '![]'
   grantType: grant_type
-  username: 
+  username: ''
   password: '![]'
   tipologie: /tipologie
   poi: /poi
