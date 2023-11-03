@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
 	<http:request-config name="HTTP_Request_microsoftGraph_token_configuration" doc:name="HTTP Request configuration" doc:id="bffc083f-c159-4400-9ffc-139075dd0fc5" >
 		<http:request-connection protocol="HTTPS" host="${microsoftGraph.tokenUrl}" />
 	</http:request-config>
@@ -14,6 +16,13 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	<http:request-config name="HTTP_Request_Realitycs_configuration" doc:name="HTTP Request configuration" doc:id="1e9805d3-21ea-4f0f-bad4-e8b8f5000ed0" >
 		<http:request-connection protocol="HTTPS" host="${realitycs.host}"/>
 	</http:request-config>
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="fc5d9425-284d-4b9c-854b-45c31f20340e" >
+		<email:smtp-connection host="smtp.office365.com" port="587" user="federico.parlapiano@xcconsulting.it" password="2804FPVP" >
+			<email:properties >
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+			</email:properties>
+		</email:smtp-connection>
+	</email:smtp-config>
 	<flow name="postImmobileFacileImmobiliare" doc:id="a821d066-9a25-42cb-a6df-1f5c9ef735e7" >
 		<flow-ref doc:name="Flow Reference" doc:id="0d316fb9-6637-4332-8bc2-392388c8838c" name="initVars"/>
 		<logger level="INFO" doc:name="Logger" doc:id="403e60f1-6b03-43fc-84e0-ee51c6b8c6aa" message="#[%dw 2.0&#10;output application/json&#10;---&#10;'[fName:' ++ vars.fname ++  '] post facileImmobiliare Immobile request: [' ++ (write(payload default '', &quot;application/json&quot;)) ++ ']']" />
@@ -761,6 +770,11 @@ output application/json
 {
 	"Authorization" : vars.token
 }]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/json
+---
+{
+	'\$filter' : 'startswith(mail,' ++ '\'' ++ attributes.queryParams.'firstLetterEmail' ++ '\')'
+}]]]></http:query-params>
 		</http:request>
 		<ee:transform doc:name="Transform Message" doc:id="b879c3ac-342f-481b-a790-b983fd6fe22b" >
 			<ee:message >
@@ -1264,6 +1278,7 @@ payload]]></ee:set-payload>
 		<choice doc:name="Choice" doc:id="e00765d0-d068-41e2-8781-13928b28f8b2" >
 			<when expression='#[vars.token != "error"]'>
 				<http:request method="GET" doc:name="Request" doc:id="0dcdf261-a902-447a-b99e-cd78a05b3c5d" config-ref="HTTP_Request_microsoftGraph_configuration" path="${microsoftGraph.version}${microsoftGraph.users}/{id}${microsoftGraph.calendar}/delta" >
+					<reconnect />
 					<http:headers ><![CDATA[#[output application/java
 ---
 {
@@ -1350,6 +1365,7 @@ output application/json
 		<choice doc:name="Check error" doc:id="0ed79615-ad21-4eb2-b616-1582352cad66" >
 			<when expression='#[vars.token != "error"]'>
 				<http:request method="GET" doc:name="Request only url" doc:id="1936ea49-ad9c-431e-bccf-0e7be8382105" url="#[payload.request.url]">
+					<reconnect />
 					<http:headers ><![CDATA[#[output application/java
 ---
 {
@@ -1448,4 +1464,76 @@ output application/json
 			</on-error-propagate>
 		</error-handler>
 	</flow>
+	<flow name="getUsersByEmail" doc:id="299bf476-8bd1-4398-95ee-8cf205232bf6" >
+		<flow-ref doc:name="Flow Reference" doc:id="30da032d-d5d1-424b-af4f-c515ebcb3bd1" name="tokenMicrosoftToken" target="token" />
+		<http:request method="GET" doc:name="Request" doc:id="a55fc337-635c-44a2-b6b7-0cc5ab3af283" config-ref="HTTP_Request_microsoftGraph_configuration" path="${microsoftGraph.version}${microsoftGraph.users}" >
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.token
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/json
+---
+{
+	'\$filter' : 'mail eq ' ++ '\'' ++ attributes.queryParams.'mail' ++ '\''
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="dd731d74-8859-40e9-9c48-f5a317e7daf0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c7fdd4b0-381e-4ac5-8d33-c4a711cdddac" >
+				<logger level="INFO" doc:name="Logger" doc:id="35fe5f73-9b1d-4100-b475-24c4f04a9ee8" message="#[error]" />
+				<ee:transform doc:name="Transform Message" doc:id="9772598d-0dd4-4b56-80d3-b2eb399fc1bd" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.detailedDescription,
+	"status": error.muleMessage.attributes.StatusCode
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+<!-- [STUDIO:"TestInvioEmail"]	<flow name="TestInvioEmail" doc:id="5a1c41cc-136c-406d-9f31-730bb79bbfdc" >
+		<scheduler doc:name="Scheduler" doc:id="fab41893-e229-4a74-9013-f6d63993bae9" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="1" timeUnit="DAYS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="Logger" doc:id="66b57f11-5f18-446d-af3a-1f1f4276e2e9" message="prima dell invio"/>
+		<email:send doc:name="Send" doc:id="7057f1b9-fd55-4b2c-acab-486ea1fd612f" config-ref="Email_SMTP" fromAddress="marco.gargano@xcconsulting.it" subject="Test Floriano">
+			<email:to-addresses >
+				<email:to-address value="floriano.cecati@xcconsulting.it" />
+			</email:to-addresses>
+			<email:body >
+				<email:content ><![CDATA[#['prova'&#93;&#93;&#93;></email:content>
+			</email:body>
+		</email:send>
+		<logger level="INFO" doc:name="Logger" doc:id="2b1fb1fd-a731-4bfe-b7e0-ddf8fdcd8b23" message="dopo invio"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="46abbc8b-3322-4698-9ac1-01fe0c32e178" >
+				<logger level="INFO" doc:name="Logger" doc:id="3614e177-5cf7-4f7b-b43c-94198d3ae6a3" message="#[error&#93;" />
+				<ee:transform doc:name="Transform Message" doc:id="15c2af3d-bca1-4319-b656-e76001866768" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{
+	"message": error.detailedDescription,
+	"status": error.muleMessage.attributes.StatusCode
+}&#93;&#93;></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow> [STUDIO] -->
 </mule>
